@@ -1,0 +1,39 @@
+[INFO ][2016-11-03 17:18:17,155][ContextLoader:273] Root WebApplicationContext: initialization started
+[INFO ][2016-11-03 17:18:17,229][AbstractApplicationContext:510] Refreshing Root WebApplicationContext: startup date [Thu Nov 03 17:18:17 CST 2016]; root of context hierarchy
+[INFO ][2016-11-03 17:18:17,271][XmlBeanDefinitionReader:315] Loading XML bean definitions from class path resource [spring/spring-context.xml]
+[INFO ][2016-11-03 17:18:17,383][ClassPathScanningCandidateComponentProvider:231] JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning
+[INFO ][2016-11-03 17:18:17,571][XmlBeanDefinitionReader:315] Loading XML bean definitions from class path resource [spring/spring-context-service.xml]
+[INFO ][2016-11-03 17:18:17,596][ClassPathScanningCandidateComponentProvider:231] JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning
+[INFO ][2016-11-03 17:18:17,708][XmlBeanDefinitionReader:315] Loading XML bean definitions from class path resource [spring/spring-mybatis.xml]
+[INFO ][2016-11-03 17:18:17,741][XmlBeanDefinitionReader:315] Loading XML bean definitions from class path resource [spring/spring-activemq.xml]
+[INFO ][2016-11-03 17:18:17,764][XmlBeanDefinitionReader:315] Loading XML bean definitions from class path resource [spring/spring-reconciliation.xml]
+[INFO ][2016-11-03 17:18:17,779][XmlBeanDefinitionReader:315] Loading XML bean definitions from class path resource [spring/permission/spring-shiro.xml]
+[INFO ][2016-11-03 17:18:20,627][XmlBeanDefinitionReader:315] Loading XML bean definitions from class path resource [spring/permission/spring-cache.xml]
+[INFO ][2016-11-03 17:18:20,974][Version:25] apple-config-diamond 0.2.1.RELEASE
+[WARN ][2016-11-03 17:18:20,976][ExtendedPropertyPlaceholderConfigurer:83] 配置项：group=null
+[WARN ][2016-11-03 17:18:20,976][ExtendedPropertyPlaceholderConfigurer:84] 配置项：dataId=null
+[INFO ][2016-11-03 17:18:20,981][DefaultSingletonBeanRegistry:444] Destroying singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@8ffeeb6: defining beans [propertyConfigurer,org.springframework.context.annotation.internalConfigurationAnnotationProcessor,org.springframework.context.annotation.internalAutowiredAnnotationProcessor,org.springframework.context.annotation.internalRequiredAnnotationProcessor,org.springframework.context.annotation.internalCommonAnnotationProcessor,accountController,webExceptionHandler,loginController,payProductController,payWayController,userPayConfigController,reconciliationController,settController,tradeController,userInfoController,pmsMenuBiz,pmsMenuController,pmsOperatorController,pmsPermissionController,pmsRoleController,rpAccountDaoImpl,rpAccountHistoryDaoImpl,rpSettDailyCollectDaoImpl,rpSettRecordAnnexDaoImpl,rpSettRecordDaoImpl,rpAccountHistoryService,rpAccountQueryService,rpAccountService,rpAccountTransactionService,rpSettHandleService,rpSettQueryService,rpNotifyRecordDao,rpNotifyRecordLogDao,rpNotifyService,pmsMenuDao,pmsRoleMenuDao,pmsOperatorDaoImpl,pmsOperatorLogDaoImpl,pmsOperatorRoleDaoImpl,pmsPermissionDaoImpl,pmsRoleDaoImpl,pmsRolePermissionDaoImpl,pmsMenuRoleService,pmsMenuService,pmsOperatorLogService,pmsOperatorRoleService,pmsOperatorService,pmsPermissionService,pmsRolePermissionService,pmsRoleService,rpAccountCheckBatchDaoImpl,rpAccountCheckMistakeDaoImpl,rpAccountCheckMistakeScratchPoolDaoImpl,reconciliationFactory,rpAccountCheckBatchService,rpAccountCheckMistakeScratchPoolService,rpAccountCheckMistakeService,rpAccountCheckTransactionService,rpTradePaymentOrderDao,rpTradePaymentRecordDao,rpTradePaymentManagerService,rpTradePaymentQueryService,rpTradeReconciliationService,aliF2FPaySubmit,buildNoDaoImpl,rpPayProductDaoImpl,rpPayWayDaoImpl,rpUserBankAccountDaoImpl,rpUserInfoDaoImpl,rpUserPayConfigDaoImpl,rpUserPayInfoDaoImpl,buildNoService,rpPayProductService,rpPayWayService,rpUserBankAccountService,rpUserInfoService,rpUserPayConfigService,rpUserPayInfoService,org.springframework.aop.config.internalAutoProxyCreator,dataSource,sqlSessionFactory,sessionTemplate,transactionManager,org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0,org.springframework.transaction.interceptor.TransactionInterceptor#0,org.springframework.transaction.config.internalTransactionAdvisor,targetConnectionFactory,pooledConnectionFactory,connectionFactory,notifyJmsTemplate,WEIXIN,ALIPAY,cacheManager,credentialsMatcher,userRealm,securityManager,org.springframework.beans.factory.config.MethodInvokingFactoryBean#0,authcFilter,rcCaptchaValidateFilter,shiroFilter,lifecycleBeanPostProcessor,springCacheManager,ehcacheManager,org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor]; root of factory hierarchy
+[ERROR][2016-11-03 17:18:20,982][ContextLoader:319] Context initialization failed
+org.springframework.beans.factory.BeanDefinitionStoreException: Invalid bean definition with name 'dataSource' defined in class path resource [spring/spring-mybatis.xml]: Could not resolve placeholder 'jdbc.driver' in string value "${jdbc.driver}"
+	at org.springframework.beans.factory.config.PlaceholderConfigurerSupport.doProcessProperties(PlaceholderConfigurerSupport.java:209)
+	at org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.processProperties(PropertyPlaceholderConfigurer.java:220)
+	at com.appleframework.config.ExtendedPropertyPlaceholderConfigurer.processProperties(ExtendedPropertyPlaceholderConfigurer.java:152)
+	at org.springframework.beans.factory.config.PropertyResourceConfigurer.postProcessBeanFactory(PropertyResourceConfigurer.java:84)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:694)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:669)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:461)
+	at org.springframework.web.context.ContextLoader.configureAndRefreshWebApplicationContext(ContextLoader.java:389)
+	at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:294)
+	at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:112)
+	at org.eclipse.jetty.server.handler.ContextHandler.callContextInitialized(ContextHandler.java:771)
+	at org.eclipse.jetty.servlet.ServletContextHandler.callContextInitialized(ServletContextHandler.java:424)
+	at org.eclipse.jetty.server.handler.ContextHandler.startContext(ContextHandler.java:763)
+	at org.eclipse.jetty.servlet.ServletContextHandler.startContext(ServletContextHandler.java:249)
+	at org.eclipse.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1250)
+	at org.eclipse.jetty.server.handler.ContextHandler.doStart(ContextHandler.java:706)
+	at org.eclipse.jetty.webapp.WebAppContext.doStart(WebAppContext.java:492)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:64)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.doStart(HandlerWrapper.java:95)
+	at org.eclipse.jetty.server.Server.doStart(Server.java:277)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:64)
+	at runjettyrun.Bootstrap.main(Bootstrap.java:80)
