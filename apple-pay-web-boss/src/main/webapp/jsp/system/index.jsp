@@ -90,7 +90,7 @@
 		</div>
 	</div>
 	<div id="footer">
-		Copyright &copy; 2015-2016 <a href="http://www.appleframework.com" target="_blank">龙果学院</a>
+		Copyright &copy; 2015-2016 <a href="http://www.appleframework.com" target="_blank">Appleframework</a>
 	</div>
 </body>
 </html>

@@ -50,7 +50,7 @@ import com.appleframework.pay.trade.enums.TradeStatusEnum;
  * 
  * 对账控制器.
  * 
- * @company：广州领课网络科技有限公司（龙果学院:http://www.appleframework.com）
+ * @company：深圳市果苹网络科技有限公司（http://www.appleframework.com）
  * @author：Along.shen
  *
  */

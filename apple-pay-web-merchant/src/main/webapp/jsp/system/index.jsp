@@ -52,7 +52,7 @@ display:none;;
     <!-- Logo -->
     <a href="${baseURL }/index" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><b>龙果</b></span>
+      <span class="logo-mini"><b>Appleframework</b></span>
       <!-- logo for regular state and mobile devices -->
       <span class="logo-lg"><img src="${baseURL }/lte/images/logo.png" /></span>
     </a>
@@ -223,7 +223,7 @@ display:none;;
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
     </div>
-    <strong>Copyright &copy; 2015-2016 <a href="http://www.appleframework.com">广州市领课网络科技有限公司</a></strong> 版权所有
+    <strong>Copyright &copy; 2015-2016 <a href="http://www.appleframework.com">深圳市果苹网络科技有限公司</a></strong> 版权所有
   </footer>
 
 

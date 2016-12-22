@@ -33,7 +33,7 @@ import com.appleframework.pay.reconciliation.utils.https.HttpResponse;
  * @类修改者：
  * @修改日期：
  * @修改说明：
- * @公司名称：广州领课网络科技有限公司（龙果学院:http://www.appleframework.com）
+ * @公司名称：深圳市果苹网络科技有限公司（http://www.appleframework.com）
  * @作者：Along.shen
  * @创建时间：2016年5月23日,上午11:33:56.
  * @版本：V1.0

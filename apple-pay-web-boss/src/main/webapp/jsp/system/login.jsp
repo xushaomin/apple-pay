@@ -87,7 +87,7 @@
 		</div>
 		<div id="login_footer">
 			Copyright &copy; 2015-2016
-			<a href="http://www.appleframework.com" target="_blank">龙果学院</a>
+			<a href="http://www.appleframework.com" target="_blank">Appleframework</a>
 		</div>
 	</div>
 

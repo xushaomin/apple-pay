@@ -10,7 +10,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>龙果学院</title>
+    <title>Appleframework</title>
     <meta charset="utf-8">
     <link href="${path}pay_files/pay.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="${path}js/jquery-1.7.2.min.js"></script>
@@ -69,7 +69,7 @@
             <ul class="con-content">
             </ul>
         </div>
-        <div class="copyright">Copyright © 2015-2016 广州市领课网络科技有限公司版权所有</div>
+        <div class="copyright">Copyright © 2015-2016 深圳市果苹网络科技有限公司版权所有</div>
         <p class="yue"><a href="http://www.miitbeian.gov.cn/" target="_blank">粤ICP备16009964号</a></p>
     </div>
 </body>

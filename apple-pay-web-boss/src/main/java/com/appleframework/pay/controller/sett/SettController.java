@@ -42,7 +42,7 @@ import com.appleframework.pay.common.core.page.PageParam;
  
 /**
  * 结算管理
- * @company：广州领课网络科技有限公司（龙果学院:http://www.appleframework.com）
+ * @company：深圳市果苹网络科技有限公司（http://www.appleframework.com）
  * @author：Cruise.Xu
  */
 @Controller

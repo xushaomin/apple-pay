@@ -74,7 +74,7 @@ public class LoginController extends BaseController {
 		} else if (IncorrectCredentialsException.class.getName().equals(exceptionClassName)) {
 			error = "用户名/密码错误";
 		} else if (PermissionException.class.getName().equals(exceptionClassName)) {
-			error = "网络异常,请联系龙果管理员";
+			error = "网络异常,请联系管理员";
 		} else if (exceptionClassName != null) {
 			error = "错误提示：" + exceptionClassName;
 		}
