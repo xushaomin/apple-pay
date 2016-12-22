@@ -451,12 +451,13 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		rpTradePaymentOrder.setTrxNo(rpTradePaymentRecord.getTrxNo());// 设置支付平台支付流水号
 		rpTradePaymentOrderDao.update(rpTradePaymentOrder);
 
-		if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentRecord.getFundIntoType())) {
+		//if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentRecord.getFundIntoType())) {
 			rpAccountTransactionService.creditToAccount(rpTradePaymentRecord.getMerchantNo(),
 					rpTradePaymentRecord.getOrderAmount().subtract(rpTradePaymentRecord.getPlatIncome()),
 					rpTradePaymentRecord.getBankOrderNo(), rpTradePaymentRecord.getBankTrxNo(),
 					rpTradePaymentRecord.getTrxType(), rpTradePaymentRecord.getRemark());
-		}
+		//}
+		 
 
 		if (PayTypeEnum.F2F_PAY.name().equals(rpTradePaymentOrder.getPayTypeCode())) {// 支付宝																					// 条码支付实时返回支付结果,不需要商户通知
 			return;
