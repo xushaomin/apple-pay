@@ -916,49 +916,50 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String completeScanPay(String payWayCode ,Map<String, String> notifyMap) {
-        LOG.info("接收到{}支付结果{}",payWayCode,notifyMap);
+		LOG.info("接收到{}支付结果{}", payWayCode, notifyMap);
 
-        String returnStr = null;
-        String bankOrderNo = notifyMap.get("out_trade_no");
-        //根据银行订单号获取支付信息
-        LOG.info("bankOrderNo=" + bankOrderNo);
-        RpTradePaymentRecord rpTradePaymentRecord = rpTradePaymentRecordDao.getByBankOrderNo(bankOrderNo);
-        if (rpTradePaymentRecord == null){
-        	LOG.info("非法订单,订单不存在" + TradeBizException.TRADE_ORDER_ERROR);
-            throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,",非法订单,订单不存在");
-        }
+		String returnStr = null;
+		String bankOrderNo = notifyMap.get("out_trade_no");
+		// 根据银行订单号获取支付信息
+		LOG.info("bankOrderNo=" + bankOrderNo);
+		RpTradePaymentRecord rpTradePaymentRecord = rpTradePaymentRecordDao.getByBankOrderNo(bankOrderNo);
+		if (rpTradePaymentRecord == null) {
+			LOG.info("非法订单,订单不存在" + TradeBizException.TRADE_ORDER_ERROR);
+			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, ",非法订单,订单不存在");
+		}
 
-        LOG.info("rpTradePaymentRecord=" + rpTradePaymentRecord.toString());
-        if (TradeStatusEnum.SUCCESS.name().equals(rpTradePaymentRecord.getStatus())){
-            throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单为成功状态");
-        }
-        String merchantNo = rpTradePaymentRecord.getMerchantNo();//商户编号
+		LOG.info("rpTradePaymentRecord=" + rpTradePaymentRecord.toString());
+		if (TradeStatusEnum.SUCCESS.name().equals(rpTradePaymentRecord.getStatus())) {
+			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "订单为成功状态");
+		}
+		String merchantNo = rpTradePaymentRecord.getMerchantNo();// 商户编号
 
-        LOG.info("merchantNo=" + merchantNo);
-        //根据支付订单获取配置信息
-        String fundIntoType = rpTradePaymentRecord.getFundIntoType();//获取资金流入类型
-        String partnerKey = "";
+		LOG.info("merchantNo=" + merchantNo);
+		// 根据支付订单获取配置信息
+		String fundIntoType = rpTradePaymentRecord.getFundIntoType();// 获取资金流入类型
+		String partnerKey = "";
 
-        if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(fundIntoType)){//商户收款
-            //根据资金流向获取配置信息
-            RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(merchantNo,PayWayEnum.WEIXIN.name());
-            partnerKey = rpUserPayInfo.getPartnerKey();
-            
-            LOG.info("rpUserPayInfo=" + rpUserPayInfo.toString());
+		if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(fundIntoType)) {// 商户收款
+			// 根据资金流向获取配置信息
+			RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(merchantNo, PayWayEnum.WEIXIN.name());
+			partnerKey = rpUserPayInfo.getPartnerKey();
 
-        }else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)){//平台收款
-            partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
+			LOG.info("rpUserPayInfo=" + rpUserPayInfo.toString());
 
-            RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByUserNo(merchantNo);
-            if (rpUserPayConfig == null){
-                throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
-            }
-            //根据支付产品及支付方式获取费率
-            RpPayWay payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(), rpTradePaymentRecord.getPayWayCode(), rpTradePaymentRecord.getPayTypeCode());
-            if(payWay == null){
-                throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
-            }
-        }
+		} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
+			partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
+
+			RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByUserNo(merchantNo);
+			if (rpUserPayConfig == null) {
+				throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
+			}
+			// 根据支付产品及支付方式获取费率
+			RpPayWay payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(),
+					rpTradePaymentRecord.getPayWayCode(), rpTradePaymentRecord.getPayTypeCode());
+			if (payWay == null) {
+				throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
+			}
+		}
 
 
         if(PayWayEnum.WEIXIN.name().equals(payWayCode)){

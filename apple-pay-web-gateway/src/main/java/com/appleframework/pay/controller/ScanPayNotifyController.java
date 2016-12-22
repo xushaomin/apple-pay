@@ -60,13 +60,12 @@ public class ScanPayNotifyController {
             Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
             notifyMap = AliPayUtil.parseNotifyMsg(requestParams);
         }        
-        String completeWeiXinScanPay = rpTradePaymentManagerService.completeScanPay(payWayCode ,notifyMap);
-        System.out.println("completeWeiXinScanPay=" + completeWeiXinScanPay);
-        if (!StringUtil.isEmpty(completeWeiXinScanPay)){
+        String completePayNotify = rpTradePaymentManagerService.completeScanPay(payWayCode ,notifyMap);
+        if (!StringUtil.isEmpty(completePayNotify)){
             if (PayWayEnum.WEIXIN.name().equals(payWayCode)){
                 httpServletResponse.setContentType("text/xml");
             }
-            httpServletResponse.getWriter().print(completeWeiXinScanPay);
+            httpServletResponse.getWriter().print(completePayNotify);
         }
     }
 
