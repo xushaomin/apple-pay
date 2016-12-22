@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2102 RonCoo(http://www.appleframework.com) Group.
+ * Copyright 2015-2102 AppleFramework(http://www.appleframework.com) Group.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.roncoo.controller;
+package com.appleframework.pay.controller;
 
-import com.roncoo.utils.HttpUtils;
-import com.roncoo.utils.MerchantApiUtil;
-import com.roncoo.utils.PayConfigUtil;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.appleframework.boot.utils.HttpUtils;
+import com.appleframework.pay.utils.MerchantApiUtil;
+import com.appleframework.pay.utils.PayConfigUtil;
 
 /**
  * <b>功能说明:控制类
@@ -37,7 +39,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping(value = "/applePay")
-public class RoncooPayController  extends BaseController{
+public class ApplePayController  extends BaseController{
 
         @RequestMapping("/scanPay")
         public String scanPay(HttpServletRequest httpServletRequest , HttpServletResponse httpServletResponse ,Model model){
@@ -152,7 +154,7 @@ public class RoncooPayController  extends BaseController{
             
             String message = null;
 			try {
-				message = HttpUtils.post("http://112.74.135.34:8280/web-gateway/appPay/jsonPay", paramMap);
+				message = HttpUtils.post("http://127.0.0.1:8280/web-gateway/appPay/jsonPay", paramMap);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
