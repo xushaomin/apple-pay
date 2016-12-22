@@ -35,7 +35,7 @@ import com.appleframework.pay.account.exception.AccountBizException;
 import com.appleframework.pay.account.service.RpAccountTransactionService;
 import com.appleframework.pay.common.core.enums.PublicEnum;
 import com.appleframework.pay.common.core.utils.DateUtils;
-import com.appleframework.pay.common.core.utils.StringUtil;
+import com.appleframework.pay.common.core.utils.IdUtil;
 import com.appleframework.pay.trade.enums.TrxTypeEnum;
 
 /**
@@ -145,6 +145,7 @@ public class RpAccountTransactionServiceImpl implements RpAccountTransactionServ
 
 		// 记录账户历史
 		RpAccountHistory accountHistoryEntity = new RpAccountHistory();
+		accountHistoryEntity.setId(IdUtil.nextId().toString());
 		accountHistoryEntity.setCreateTime(new Date());
 		accountHistoryEntity.setEditTime(new Date());
 		accountHistoryEntity.setIsAllowSett(isAllowSett);
@@ -157,7 +158,6 @@ public class RpAccountTransactionServiceImpl implements RpAccountTransactionServ
 		accountHistoryEntity.setFundDirection(AccountFundDirectionEnum.ADD.name());
 		accountHistoryEntity.setAccountNo(account.getAccountNo());
 		accountHistoryEntity.setTrxType(trxType);
-		accountHistoryEntity.setId(StringUtil.get32UUID());
 		accountHistoryEntity.setUserNo(userNo);
 
 		this.rpAccountHistoryDao.insert(accountHistoryEntity);
@@ -232,6 +232,7 @@ public class RpAccountTransactionServiceImpl implements RpAccountTransactionServ
 
 		// 记录账户历史
 		RpAccountHistory accountHistoryEntity = new RpAccountHistory();
+		accountHistoryEntity.setId(IdUtil.nextId().toString());
 		accountHistoryEntity.setCreateTime(new Date());
 		accountHistoryEntity.setEditTime(new Date());
 		accountHistoryEntity.setIsAllowSett(isAllowSett);
@@ -244,7 +245,6 @@ public class RpAccountTransactionServiceImpl implements RpAccountTransactionServ
 		accountHistoryEntity.setFundDirection(AccountFundDirectionEnum.SUB.name());
 		accountHistoryEntity.setAccountNo(account.getAccountNo());
 		accountHistoryEntity.setTrxType(trxType);
-		accountHistoryEntity.setId(StringUtil.get32UUID());
 		accountHistoryEntity.setUserNo(userNo);
 		this.rpAccountHistoryDao.insert(accountHistoryEntity);
 		this.rpAccountDao.update(account);
