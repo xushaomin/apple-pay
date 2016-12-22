@@ -61,15 +61,15 @@
   	<!-- 异常码地址 -->
 	<error-page>
 		<error-code>400</error-code>
-		<location>/common/error.jsp</location>
+		<location>/jsp/common/error.jsp</location>
 	</error-page>
 	<error-page>
 		<error-code>404</error-code>
-		<location>/common/error.jsp</location>
+		<location>/jsp/common/error.jsp</location>
 	</error-page>
 	<error-page>
 		<error-code>500</error-code>
-		<location>/common/error.jsp</location>
+		<location>/jsp/common/error.jsp</location>
 	</error-page>
 
 	<session-config>
