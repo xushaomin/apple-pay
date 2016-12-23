@@ -99,11 +99,11 @@
 						</tr>
 						<tr>
 							<td>支付宝私钥：</td>
-							<td><input type="text" name="ali_rsaPrivateKey" id="ali_rsaPrivateKey" maxlength="200" class="required" value="${aliUserPayInfo.rsaPrivateKey }"/></td>
+							<td><textarea name="ali_rsaPrivateKey" id="ali_rsaPrivateKey" rows="10" cols="100" maxlength="1024" class="required">${aliUserPayInfo.rsaPrivateKey }</textarea></td>
 						</tr>
 						<tr>
 							<td>支付宝公钥：</td>
-							<td><input type="text" name="ali_rsaPublicKey" id="ali_rsaPublicKey" maxlength="200" class="required" value="${aliUserPayInfo.rsaPublicKey }"/></td>
+							<td><textarea name="ali_rsaPublicKey" id="ali_rsaPublicKey" rows="5" cols="100" maxlength="1024" class="required">${aliUserPayInfo.rsaPublicKey }</textarea></td>
 						</tr>
 					</table>
 				</fieldset>
