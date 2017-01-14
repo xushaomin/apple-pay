@@ -229,13 +229,16 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         //根据支付产品及支付方式获取费率
         RpPayWay payWay = null;
         PayTypeEnum payType = null;
-        if (PayWayEnum.WEIXIN.name().equals(payWayCode)){
-            payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(), payWayCode, PayTypeEnum.APPPAY.name());
-            payType = PayTypeEnum.APPPAY;
-        }else if (PayWayEnum.ALIPAY.name().equals(payWayCode)){
-            payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(), payWayCode, PayTypeEnum.DIRECT_PAY.name());
-            payType = PayTypeEnum.DIRECT_PAY;
-        }
+		if (PayWayEnum.WEIXIN.name().equals(payWayCode)) {
+			payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(), payWayCode, PayTypeEnum.APPPAY.name());
+			payType = PayTypeEnum.APPPAY;
+		} else if (PayWayEnum.ALIPAY.name().equals(payWayCode)) {
+			payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(), payWayCode, PayTypeEnum.DIRECT_PAY.name());
+			payType = PayTypeEnum.DIRECT_PAY;
+		}  else if (PayWayEnum.APPLE.name().equals(payWayCode)) {
+			payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(), payWayCode, PayTypeEnum.IN_APP.name());
+			payType = PayTypeEnum.IN_APP;
+		}
 
         if(payWay == null){
             throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
@@ -252,12 +255,10 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         if (rpTradePaymentOrder == null){
             rpTradePaymentOrder = sealRpTradePaymentOrder( merchantNo,  rpUserInfo.getUserName() , productName,  orderNo,  orderDate,  orderTime,  orderPrice, payWayCode, PayWayEnum.getEnum(payWayCode).getDesc() , payType, rpUserPayConfig.getFundIntoType() ,  orderIp,  orderPeriod,  returnUrl,  notifyUrl,  remark,  field1,  field2,  field3,  field4,  field5);
             rpTradePaymentOrderDao.insert(rpTradePaymentOrder);
-        }else{
-
+        } else {
             if (TradeStatusEnum.SUCCESS.name().equals(rpTradePaymentOrder.getStatus())){
                 throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单已支付成功,无需重复支付");
             }
-
             if (rpTradePaymentOrder.getOrderAmount().compareTo(orderPrice) != 0 ){
                 rpTradePaymentOrder.setOrderAmount(orderPrice);//如果金额不一致,修改金额为最新的金额
             }
@@ -783,11 +784,13 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         String payWayCode = payWay.getPayWayCode();//支付方式
 
         PayTypeEnum payType = null;
-        if (PayWayEnum.WEIXIN.name().equals(payWay.getPayWayCode())){
-            payType = PayTypeEnum.APPPAY;
-        }else if(PayWayEnum.ALIPAY.name().equals(payWay.getPayWayCode())){
-            payType = PayTypeEnum.APP_PAY;
-        }
+		if (PayWayEnum.WEIXIN.name().equals(payWay.getPayWayCode())) {
+			payType = PayTypeEnum.APPPAY;
+		} else if (PayWayEnum.ALIPAY.name().equals(payWay.getPayWayCode())) {
+			payType = PayTypeEnum.APP_PAY;
+		} else if (PayWayEnum.APPLE.name().equals(payWay.getPayWayCode())) {
+			payType = PayTypeEnum.IN_APP;
+		}
 
         rpTradePaymentOrder.setPayTypeCode(payType.name());
         rpTradePaymentOrder.setPayTypeName(payType.getDesc());
@@ -901,7 +904,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
             appPayResultVo.setPrePay(sParaTemp);
 
-        }else{
+        } else if (PayWayEnum.APPLE.name().equals(payWayCode)){//苹果支付
+            appPayResultVo.setPayWayCode(PayWayEnum.APPLE.name());
+            appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
+            appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
+        } else{
             throw new TradeBizException(TradeBizException.TRADE_PAY_WAY_ERROR,"错误的支付方式");
         }
 

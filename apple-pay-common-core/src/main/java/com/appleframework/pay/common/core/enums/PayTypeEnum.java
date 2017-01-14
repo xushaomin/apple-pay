@@ -37,7 +37,9 @@ public enum PayTypeEnum {
 
     F2F_PAY("ALIPAY","条码支付"),
 
-	APP_PAY("ALIPAY","APP支付");
+	APP_PAY("ALIPAY","APP支付"),
+	
+	IN_APP("APPLE","苹果内购");
 
 	/** 所属支付方式 */
     private String way;

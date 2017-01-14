@@ -29,7 +29,9 @@ public enum PayWayEnum {
 
 	WEIXIN("微信"),
 
-	ALIPAY("支付宝");
+	ALIPAY("支付宝"),
+	
+	APPLE("苹果");
 
 	/** 描述 */
 	private String desc;
