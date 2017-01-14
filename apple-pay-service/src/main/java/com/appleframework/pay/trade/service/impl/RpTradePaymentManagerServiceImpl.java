@@ -905,9 +905,13 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             appPayResultVo.setPrePay(sParaTemp);
 
         } else if (PayWayEnum.APPLE.name().equals(payWayCode)){//苹果支付
+            Map<String, String> sParaTemp = new HashMap<String, String>();
+            sParaTemp.put("out_trade_no", rpTradePaymentRecord.getBankOrderNo());
+            
             appPayResultVo.setPayWayCode(PayWayEnum.APPLE.name());
             appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
             appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
+            appPayResultVo.setPrePay(sParaTemp);
         } else{
             throw new TradeBizException(TradeBizException.TRADE_PAY_WAY_ERROR,"错误的支付方式");
         }
