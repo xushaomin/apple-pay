@@ -41,6 +41,7 @@ import com.appleframework.pay.common.core.utils.StringUtil;
 import com.appleframework.pay.trade.service.RpTradePaymentManagerService;
 import com.appleframework.pay.trade.utils.WeiXinPayUtils;
 import com.appleframework.pay.trade.utils.alipay.util.AliPayUtil;
+import com.appleframework.pay.trade.utils.alipay.util.ApplePayUtil;
 import com.appleframework.pay.trade.vo.OrderPayResultVo;
 
 @Controller
@@ -52,21 +53,24 @@ public class ScanPayNotifyController {
 
     @RequestMapping("/notify/{payWayCode}")
     public void notify(@PathVariable("payWayCode") String  payWayCode , HttpServletRequest httpServletRequest , HttpServletResponse httpServletResponse) throws Exception {
-        Map<String , String> notifyMap = new HashMap<String , String >();
-        if (PayWayEnum.WEIXIN.name().equals(payWayCode)){
-            InputStream inputStream = httpServletRequest.getInputStream();// 从request中取得输入流
-            notifyMap = WeiXinPayUtils.parseXml(inputStream);
-        }else if (PayWayEnum.ALIPAY.name().equals(payWayCode)){
-            Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
-            notifyMap = AliPayUtil.parseNotifyMsg(requestParams);
-        }        
-        String completePayNotify = rpTradePaymentManagerService.completeScanPay(payWayCode ,notifyMap);
-        if (!StringUtil.isEmpty(completePayNotify)){
-            if (PayWayEnum.WEIXIN.name().equals(payWayCode)){
-                httpServletResponse.setContentType("text/xml");
-            }
-            httpServletResponse.getWriter().print(completePayNotify);
-        }
+		Map<String, String> notifyMap = new HashMap<String, String>();
+		if (PayWayEnum.WEIXIN.name().equals(payWayCode)) {
+			InputStream inputStream = httpServletRequest.getInputStream();// 从request中取得输入流
+			notifyMap = WeiXinPayUtils.parseXml(inputStream);
+		} else if (PayWayEnum.ALIPAY.name().equals(payWayCode)) {
+			Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
+			notifyMap = AliPayUtil.parseNotifyMsg(requestParams);
+		} else if (PayWayEnum.APPLE.name().equals(payWayCode)) {
+			Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
+			notifyMap = ApplePayUtil.parseNotifyMsg(requestParams);
+		}
+		String completePayNotify = rpTradePaymentManagerService.completeScanPay(payWayCode, notifyMap);
+		if (!StringUtil.isEmpty(completePayNotify)) {
+			if (PayWayEnum.WEIXIN.name().equals(payWayCode)) {
+				httpServletResponse.setContentType("text/xml");
+			}
+			httpServletResponse.getWriter().print(completePayNotify);
+		}
     }
 
     @RequestMapping("/result/{payWayCode}")

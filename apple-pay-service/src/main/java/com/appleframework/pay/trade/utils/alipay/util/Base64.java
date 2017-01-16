@@ -1,5 +1,8 @@
 package com.appleframework.pay.trade.utils.alipay.util;
 
+import sun.misc.BASE64Decoder;
+
+@SuppressWarnings("restriction")
 public final class Base64 {
 
 	static private final int BASELENGTH = 128;
@@ -271,5 +274,41 @@ public final class Base64 {
 			}
 		}
 		return newSize;
+	}
+	
+	
+	/**
+	 * 用BASE64加密
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String encodeString(String str) {
+		byte[] b = str.getBytes();
+		String s = null;
+		if (b != null) {
+			s = new sun.misc.BASE64Encoder().encode(b);
+		}
+		return s;
+	}
+
+	/**
+	 * 解密BASE64字窜
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public static String decodeString(String s) {
+		byte[] b = null;
+		if (s != null) {
+			BASE64Decoder decoder = new BASE64Decoder();
+			try {
+				b = decoder.decodeBuffer(s);
+				return new String(b);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return new String(b);
 	}
 }

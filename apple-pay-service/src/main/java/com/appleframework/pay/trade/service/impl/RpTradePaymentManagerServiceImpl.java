@@ -56,6 +56,10 @@ import com.appleframework.pay.trade.utils.alipay.f2fpay.AliF2FPaySubmit;
 import com.appleframework.pay.trade.utils.alipay.sign.RSA;
 import com.appleframework.pay.trade.utils.alipay.util.AlipayNotify;
 import com.appleframework.pay.trade.utils.alipay.util.AlipaySubmit;
+import com.appleframework.pay.trade.utils.alipay.util.ApplePayNotify;
+import com.appleframework.pay.trade.utils.alipay.util.ApplePayUtil;
+import com.appleframework.pay.trade.utils.apple.AppleReceiptBean;
+import com.appleframework.pay.trade.utils.apple.AppleVerifyBean;
 import com.appleframework.pay.trade.vo.AppPayResultVo;
 import com.appleframework.pay.trade.vo.F2FPayResultVo;
 import com.appleframework.pay.trade.vo.OrderPayResultVo;
@@ -934,6 +938,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		String bankOrderNo = notifyMap.get("out_trade_no");
 		// 根据银行订单号获取支付信息
 		LOG.info("bankOrderNo=" + bankOrderNo);
+		
+		if(StringUtil.isEmpty(bankOrderNo)) {
+			LOG.info("非法订单,订单不存在" + TradeBizException.TRADE_ORDER_ERROR);
+			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, ",非法订单,订单不存在");
+		}
 		RpTradePaymentRecord rpTradePaymentRecord = rpTradePaymentRecordDao.getByBankOrderNo(bankOrderNo);
 		if (rpTradePaymentRecord == null) {
 			LOG.info("非法订单,订单不存在" + TradeBizException.TRADE_ORDER_ERROR);
@@ -974,60 +983,92 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		}
 
 
-        if(PayWayEnum.WEIXIN.name().equals(payWayCode)){
-            String sign = notifyMap.remove("sign");
-            LOG.info("sign=" + sign);
+		if (PayWayEnum.WEIXIN.name().equals(payWayCode)) {
+			String sign = notifyMap.remove("sign");
+			LOG.info("sign=" + sign);
 
-            if (WeiXinPayUtils.notifySign(notifyMap, sign, partnerKey)){//根据配置信息验证签名
-                if (WeixinTradeStateEnum.SUCCESS.name().equals(notifyMap.get("result_code"))){//业务结果 成功
-                    String timeEndStr = notifyMap.get("time_end");
-                    Date timeEnd = null;
-                    if (!StringUtil.isEmpty(timeEndStr)){
-                        timeEnd =  DateUtils.getDateFromString(timeEndStr,"yyyyMMddHHmmss");//订单支付完成时间
-                    }
-                    completeSuccessOrder(rpTradePaymentRecord, notifyMap.get("transaction_id"),timeEnd, notifyMap.toString());
-                    returnStr = 
-                    		"<xml>\n" +
-                            "  <return_code><![CDATA[SUCCESS]]></return_code>\n" +
-                            "  <return_msg><![CDATA[OK]]></return_msg>\n" +
-                            "</xml>";
-                    LOG.info("returnStr=" + returnStr);
-                }else{
-                    completeFailOrder(rpTradePaymentRecord,notifyMap.toString());
-                }
-            }else{
-                throw new TradeBizException(TradeBizException.TRADE_WEIXIN_ERROR,"微信签名失败");
-            }
+			if (WeiXinPayUtils.notifySign(notifyMap, sign, partnerKey)) {// 根据配置信息验证签名
+				if (WeixinTradeStateEnum.SUCCESS.name().equals(notifyMap.get("result_code"))) {// 业务结果成功
+					String timeEndStr = notifyMap.get("time_end");
+					Date timeEnd = null;
+					if (!StringUtil.isEmpty(timeEndStr)) {
+						timeEnd = DateUtils.getDateFromString(timeEndStr, "yyyyMMddHHmmss");// 订单支付完成时间
+					}
+					completeSuccessOrder(rpTradePaymentRecord, notifyMap.get("transaction_id"), timeEnd,
+							notifyMap.toString());
+					returnStr = "<xml>\n" + "  <return_code><![CDATA[SUCCESS]]></return_code>\n"
+							+ "  <return_msg><![CDATA[OK]]></return_msg>\n" + "</xml>";
+					LOG.info("returnStr=" + returnStr);
+				} else {
+					completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
+				}
+			} else {
+				throw new TradeBizException(TradeBizException.TRADE_WEIXIN_ERROR, "微信签名失败");
+			}
 
-        }else if (PayWayEnum.ALIPAY.name().equals(payWayCode)){
-            if(AlipayNotify.verify(notifyMap)){//验证成功
-                String tradeStatus = notifyMap.get("trade_status");
-                if(AliPayTradeStateEnum.TRADE_FINISHED.name().equals(tradeStatus)){
-                    //判断该笔订单是否在商户网站中已经做过处理
-                    //如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
-                    //请务必判断请求时的total_fee、seller_id与通知时获取的total_fee、seller_id为一致的
-                    //如果有做过处理，不执行商户的业务程序
+		} else if (PayWayEnum.ALIPAY.name().equals(payWayCode)) {
+			if (AlipayNotify.verify(notifyMap)) {// 验证成功
+				String tradeStatus = notifyMap.get("trade_status");
+				if (AliPayTradeStateEnum.TRADE_FINISHED.name().equals(tradeStatus)) {
+					// 判断该笔订单是否在商户网站中已经做过处理
+					// 如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
+					// 请务必判断请求时的total_fee、seller_id与通知时获取的total_fee、seller_id为一致的
+					// 如果有做过处理，不执行商户的业务程序
 
-                    //注意：
-                    //退款日期超过可退款期限后（如三个月可退款），支付宝系统发送该交易状态通知
-                } else if (AliPayTradeStateEnum.TRADE_SUCCESS.name().equals(tradeStatus)){
-                    String gmtPaymentStr = notifyMap.get("gmt_payment");//付款时间
-                    Date timeEnd = null;
-                    if(!StringUtil.isEmpty(gmtPaymentStr)){
-                        timeEnd = DateUtils.getDateFromString(gmtPaymentStr,"yyyy-MM-dd HH:mm:ss");
-                    }
-                    completeSuccessOrder(rpTradePaymentRecord, notifyMap.get("trade_no"), timeEnd ,notifyMap.toString());
-                    returnStr = "success";
-                }else{
-                    completeFailOrder(rpTradePaymentRecord,notifyMap.toString());
-                    returnStr = "fail";
-                }
-            }else{//验证失败
-                throw new TradeBizException(TradeBizException.TRADE_ALIPAY_ERROR,"支付宝签名异常");
-            }
-        }else{
-            throw new TradeBizException(TradeBizException.TRADE_PAY_WAY_ERROR,"错误的支付方式");
-        }
+					// 注意：
+					// 退款日期超过可退款期限后（如三个月可退款），支付宝系统发送该交易状态通知
+				} else if (AliPayTradeStateEnum.TRADE_SUCCESS.name().equals(tradeStatus)) {
+					String gmtPaymentStr = notifyMap.get("gmt_payment");// 付款时间
+					Date timeEnd = null;
+					if (!StringUtil.isEmpty(gmtPaymentStr)) {
+						timeEnd = DateUtils.getDateFromString(gmtPaymentStr, "yyyy-MM-dd HH:mm:ss");
+					}
+					completeSuccessOrder(rpTradePaymentRecord, notifyMap.get("trade_no"), timeEnd, notifyMap.toString());
+					returnStr = "success";
+				} else {
+					completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
+					returnStr = "fail";
+				}
+			} else {// 验证失败
+				throw new TradeBizException(TradeBizException.TRADE_ALIPAY_ERROR, "支付宝签名异常");
+			}
+		} else if (PayWayEnum.APPLE.name().equals(payWayCode)) {
+			//苹果客户端传上来的收据,是最原据的收据  
+			String receipt = notifyMap.get("receipt");			
+			String verifyResult = ApplePayNotify.buyAppVerify(receipt, "Sandbox");
+			
+			if (verifyResult == null) {
+                //苹果服务器没有返回验证结果  
+            	completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
+				returnStr = "fail";
+			} else {
+				//跟苹果验证有返回结果------------------ 
+				AppleVerifyBean verifybean = ApplePayUtil.parseJsonToBean(verifyResult);
+				String states = verifybean.getStatus().toString();
+				if (states.equals("0")) {// 验证成功
+					
+					AppleReceiptBean receiptBean = verifybean.getReceipt();
+					String timeEndStr = receiptBean.getReceipt_creation_date();
+					Date timeEnd = null;
+					if (!StringUtil.isEmpty(timeEndStr)) {
+						timeEnd = DateUtils.getDateFromString(timeEndStr, "yyyy-MM-dd HH:mm:ss z");// 订单支付完成时间
+					}
+					
+					String transactionId = ApplePayUtil.getTransactionId(receiptBean);
+					completeSuccessOrder(rpTradePaymentRecord, transactionId, timeEnd, verifyResult.toString());
+					returnStr = "success";
+					LOG.info("returnStr=" + returnStr);
+				} else {
+					// 账单无效
+					completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
+					returnStr = "fail";
+				}
+                //跟苹果验证有返回结果------------------  
+            }  
+			
+		} else {
+			throw new TradeBizException(TradeBizException.TRADE_PAY_WAY_ERROR, "错误的支付方式");
+		}
 
         LOG.info("返回支付通道{}信息{}",payWayCode,returnStr);
         return returnStr;
