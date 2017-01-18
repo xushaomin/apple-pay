@@ -27,9 +27,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TradeBizException extends BizException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3536909333010163563L;
 
 	/** 错误的支付方式 **/
@@ -37,6 +34,7 @@ public class TradeBizException extends BizException {
 
 	/** 微信异常 **/
 	public static final int TRADE_WEIXIN_ERROR = 103;
+	
 	/** 订单异常 **/
 	public static final int TRADE_ORDER_ERROR = 104;
 
@@ -48,6 +46,9 @@ public class TradeBizException extends BizException {
 
 	/** 参数异常 **/
 	public static final int TRADE_PARAM_ERROR = 107;
+	
+	/** 参数异常 **/
+	public static final int TRADE_APPLE_ERROR = 108;
 
 	private static final Log LOG = LogFactory.getLog(TradeBizException.class);
 

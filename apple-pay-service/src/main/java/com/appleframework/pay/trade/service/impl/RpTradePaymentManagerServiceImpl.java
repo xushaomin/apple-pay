@@ -940,8 +940,8 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		LOG.info("bankOrderNo=" + bankOrderNo);
 		
 		if(StringUtil.isEmpty(bankOrderNo)) {
-			LOG.info("非法订单,订单不存在" + TradeBizException.TRADE_ORDER_ERROR);
-			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "非法订单,订单不存在");
+			LOG.info("参数out_trade_no异常" + TradeBizException.TRADE_PARAM_ERROR);
+			throw new TradeBizException(TradeBizException.TRADE_PARAM_ERROR, "参数out_trade_no异常");
 		}
 		RpTradePaymentRecord rpTradePaymentRecord = rpTradePaymentRecordDao.getByBankOrderNo(bankOrderNo);
 		if (rpTradePaymentRecord == null) {
@@ -1039,8 +1039,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			
 			if (verifyResult == null) {
                 //苹果服务器没有返回验证结果  
-            	completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
-				returnStr = "fail";
+            	//completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
+				//returnStr = "fail";
+				throw new TradeBizException(TradeBizException.TRADE_APPLE_ERROR, "苹果签名异常");
 			} else {
 				//跟苹果验证有返回结果------------------ 
 				AppleVerifyBean verifybean = ApplePayUtil.parseJsonToBean(verifyResult);
@@ -1056,12 +1057,13 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 					
 					String transactionId = ApplePayUtil.getTransactionId(receiptBean);
 					completeSuccessOrder(rpTradePaymentRecord, transactionId, timeEnd, verifyResult.toString());
-					returnStr = "success";
+					returnStr = "{\"message\": \"success\",\"code\": 0}";
 					LOG.info("returnStr=" + returnStr);
 				} else {
 					// 账单无效
-					completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
-					returnStr = "fail";
+					//completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
+					//returnStr = "{\"message\": \"success\",\"code\": 0}";
+					throw new TradeBizException(TradeBizException.TRADE_APPLE_ERROR, "苹果验证异常");
 				}
                 //跟苹果验证有返回结果------------------  
             }  
