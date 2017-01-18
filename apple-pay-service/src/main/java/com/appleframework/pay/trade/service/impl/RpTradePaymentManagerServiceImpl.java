@@ -941,12 +941,12 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		
 		if(StringUtil.isEmpty(bankOrderNo)) {
 			LOG.info("非法订单,订单不存在" + TradeBizException.TRADE_ORDER_ERROR);
-			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, ",非法订单,订单不存在");
+			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "非法订单,订单不存在");
 		}
 		RpTradePaymentRecord rpTradePaymentRecord = rpTradePaymentRecordDao.getByBankOrderNo(bankOrderNo);
 		if (rpTradePaymentRecord == null) {
 			LOG.info("非法订单,订单不存在" + TradeBizException.TRADE_ORDER_ERROR);
-			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, ",非法订单,订单不存在");
+			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "非法订单,订单不存在");
 		}
 
 		LOG.info("rpTradePaymentRecord=" + rpTradePaymentRecord.toString());
