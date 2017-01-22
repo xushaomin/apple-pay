@@ -42,7 +42,7 @@ public class ApplePayNotify {
 	/**
 	 * APPLE消息验证地址
 	 */
-	private final static String VERIFY_URL_SANDBIOX = "https://sandbox.itunes.apple.com/verifyReceipt";
+	private final static String VERIFY_URL_SANDBOX = "https://sandbox.itunes.apple.com/verifyReceipt";
 
 	private final static String VERIFY_URL_RELEASE  = "https://buy.itunes.apple.com/verifyReceipt";
 
@@ -54,10 +54,10 @@ public class ApplePayNotify {
 	 * @return null 或返回结果 沙盒 https://sandbox.itunes.apple.com/verifyReceipt
 	 * 
 	 */
-	public static String buyAppVerify(String receipt, String verifyState) {
+	public static String buyAppVerify(String receipt, boolean isSandbox) {
 		String url = VERIFY_URL_RELEASE;
-		if (verifyState != null && verifyState.equals("Sandbox")) {
-			url = VERIFY_URL_SANDBIOX;
+		if (isSandbox == true) {
+			url = VERIFY_URL_SANDBOX;
 		}
 		//String buyCode = Base64.decodeString(receipt);
 		String buyCode = receipt;

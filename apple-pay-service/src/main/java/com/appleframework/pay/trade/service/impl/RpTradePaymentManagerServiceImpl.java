@@ -994,10 +994,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 					if (!StringUtil.isEmpty(timeEndStr)) {
 						timeEnd = DateUtils.getDateFromString(timeEndStr, "yyyyMMddHHmmss");// 订单支付完成时间
 					}
-					completeSuccessOrder(rpTradePaymentRecord, notifyMap.get("transaction_id"), timeEnd,
-							notifyMap.toString());
-					returnStr = "<xml>\n" + "  <return_code><![CDATA[SUCCESS]]></return_code>\n"
-							+ "  <return_msg><![CDATA[OK]]></return_msg>\n" + "</xml>";
+					completeSuccessOrder(rpTradePaymentRecord, notifyMap.get("transaction_id"), timeEnd, notifyMap.toString());
+					returnStr = "<xml>\n" 
+							+ "  <return_code><![CDATA[SUCCESS]]></return_code>\n"
+							+ "  <return_msg><![CDATA[OK]]></return_msg>\n" 
+							+ "</xml>";
 					LOG.info("returnStr=" + returnStr);
 				} else {
 					completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
@@ -1034,8 +1035,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			}
 		} else if (PayWayEnum.APPLE.name().equals(payWayCode)) {
 			//苹果客户端传上来的收据,是最原据的收据  
-			String receipt = notifyMap.get("receipt");			
-			String verifyResult = ApplePayNotify.buyAppVerify(receipt, "Sandbox");
+			String receipt = notifyMap.get("receipt");
+			Boolean isSandbox = PropertyConfigurer.getBoolean("applepay.sandbox", true);
+			String verifyResult = ApplePayNotify.buyAppVerify(receipt, isSandbox);
 			
 			if (verifyResult == null) {
                 //苹果服务器没有返回验证结果  
@@ -1098,7 +1100,8 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         orderPayResultVo.setOrderPrice(rpTradePaymentRecord.getOrderAmount());//订单金额
         orderPayResultVo.setProductName(rpTradePaymentRecord.getProductName());//产品名称
 
-        RpTradePaymentOrder rpTradePaymentOrder = rpTradePaymentOrderDao.selectByMerchantNoAndMerchantOrderNo(rpTradePaymentRecord.getMerchantNo(), rpTradePaymentRecord.getMerchantOrderNo());
+        RpTradePaymentOrder rpTradePaymentOrder = rpTradePaymentOrderDao
+        		.selectByMerchantNoAndMerchantOrderNo(rpTradePaymentRecord.getMerchantNo(), rpTradePaymentRecord.getMerchantOrderNo());
 
         String trade_status = resultMap.get("trade_status");
         //计算得出通知验证结果
