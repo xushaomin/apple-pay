@@ -76,6 +76,7 @@ import com.appleframework.pay.user.service.RpPayWayService;
 import com.appleframework.pay.user.service.RpUserInfoService;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
 import com.appleframework.pay.user.service.RpUserPayInfoService;
+import com.taobao.diamond.utils.JSONUtils;
 
 /**
  * <b>功能说明:交易模块管理实现类实现</b>
@@ -222,8 +223,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
      * @param field5      扩展字段5
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public AppPayResultVo initDirectAppPay(String payKey, String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice, String payWayCode, String orderIp, Integer orderPeriod, String returnUrl, String notifyUrl, String remark, String field1, String field2, String field3, String field4, String field5) {
+	@Transactional(rollbackFor = Exception.class)
+	public AppPayResultVo initDirectAppPay(String payKey, String productName, String orderNo, Date orderDate,
+			Date orderTime, BigDecimal orderPrice, String payWayCode, String orderIp, Integer orderPeriod,
+			String returnUrl, String notifyUrl, String remark, String field1, String field2, String field3,
+			String field4, String field5) {
 
         RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
         if (rpUserPayConfig == null){
@@ -1041,8 +1045,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			
 			if (verifyResult == null) {
                 //苹果服务器没有返回验证结果  
-            	//completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
-				//returnStr = "fail";
+            	try {
+					completeFailOrder(rpTradePaymentRecord, JSONUtils.serializeObject(notifyMap));
+				} catch (Exception e) {}
 				throw new TradeBizException(TradeBizException.TRADE_APPLE_ERROR, "苹果签名异常");
 			} else {
 				//跟苹果验证有返回结果------------------ 
@@ -1063,8 +1068,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 					LOG.info("returnStr=" + returnStr);
 				} else {
 					// 账单无效
-					//completeFailOrder(rpTradePaymentRecord, notifyMap.toString());
-					//returnStr = "{\"message\": \"success\",\"code\": 0}";
+					completeFailOrder(rpTradePaymentRecord, verifyResult);
 					throw new TradeBizException(TradeBizException.TRADE_APPLE_ERROR, "苹果验证异常");
 				}
                 //跟苹果验证有返回结果------------------  

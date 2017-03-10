@@ -30,8 +30,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,13 +43,10 @@ import com.appleframework.pay.trade.utils.WeiXinPayUtils;
 import com.appleframework.pay.trade.utils.alipay.util.AliPayUtil;
 import com.appleframework.pay.trade.utils.alipay.util.ApplePayUtil;
 import com.appleframework.pay.trade.vo.OrderPayResultVo;
-import com.taobao.diamond.utils.JSONUtils;
 
 @Controller
 @RequestMapping(value = "/scanPayNotify")
 public class ScanPayNotifyController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ScanPayNotifyController.class);
 
     @Autowired
     private RpTradePaymentManagerService rpTradePaymentManagerService;
@@ -70,12 +65,6 @@ public class ScanPayNotifyController {
 		} else if (PayWayEnum.APPLE.name().equals(payWayCode)) {
 			Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
 			notifyMap = ApplePayUtil.parseNotifyMsg(requestParams);
-		}
-		if (LOG.isInfoEnabled()) {
-			try {
-				LOG.info("NOTIFY请求参数:" + JSONUtils.serializeObject(notifyMap));
-			} catch (Exception e) {
-			}
 		}
 		String completePayNotify = rpTradePaymentManagerService.completeScanPay(payWayCode, notifyMap);
 		if (!StringUtil.isEmpty(completePayNotify)) {
