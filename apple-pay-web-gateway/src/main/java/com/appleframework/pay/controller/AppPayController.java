@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +37,7 @@ import com.appleframework.pay.trade.vo.AppPayResultVo;
 import com.appleframework.pay.user.entity.RpUserPayConfig;
 import com.appleframework.pay.user.exception.UserBizException;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
+import com.taobao.diamond.utils.JSONUtils;
 
 /**
  * <b>功能说明:扫码支付控制类
@@ -45,6 +48,8 @@ import com.appleframework.pay.user.service.RpUserPayConfigService;
 @Controller
 @RequestMapping(value = "/appPay")
 public class AppPayController extends BaseController {
+	
+    private static final Logger LOG = LoggerFactory.getLogger(AppPayController.class);
 
     @Autowired
     private RpTradePaymentManagerService rpTradePaymentManagerService;
@@ -102,22 +107,31 @@ public class AppPayController extends BaseController {
         String field5 = getString_UrlDecode_UTF8("field5"); // 扩展字段5
         paramMap.put("field5",field5);
 
-        Date orderDate = DateUtils.parseDate(orderDateStr,"yyyyMMdd");
-        Date orderTime = DateUtils.parseDate(orderTimeStr,"yyyyMMddHHmmss");
-        Integer orderPeriod = Integer.valueOf(orderPeriodStr);
-
-        RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
-        if (rpUserPayConfig == null){
-            throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
+		Date orderDate = DateUtils.parseDate(orderDateStr, "yyyyMMdd");
+		Date orderTime = DateUtils.parseDate(orderTimeStr, "yyyyMMddHHmmss");
+		Integer orderPeriod = Integer.valueOf(orderPeriodStr);
+        
+        if(LOG.isInfoEnabled()) {
+        	try {
+				LOG.info("PAY请求参数:" + JSONUtils.serializeObject(paramMap));
+			} catch (Exception e) {
+			}
         }
 
-        if (!MerchantApiUtil.isRightSign(paramMap,rpUserPayConfig.getPaySecret(),sign)){
+		RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
+		if (rpUserPayConfig == null) {
+			throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
+		}
+
+		if (!MerchantApiUtil.isRightSign(paramMap, rpUserPayConfig.getPaySecret(), sign)) {
             throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
         }
 
-        BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
-        AppPayResultVo appPayResultVo = rpTradePaymentManagerService.initDirectAppPay(payKey, productName, orderNo, orderDate, orderTime, orderPrice, payWayCode, orderIp, orderPeriod, returnUrl
-                    , notifyUrl, remark, field1, field2, field3, field4, field5);
+		BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
+        AppPayResultVo appPayResultVo = rpTradePaymentManagerService.initDirectAppPay(
+        			payKey, productName, orderNo, orderDate, orderTime, orderPrice, 
+        			payWayCode, orderIp, orderPeriod, returnUrl, notifyUrl, remark, 
+        			field1, field2, field3, field4, field5);
 
         return appPayResultVo;
     }
