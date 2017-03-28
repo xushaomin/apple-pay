@@ -1059,7 +1059,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 					String timeEndStr = receiptBean.getReceipt_creation_date();
 					Date timeEnd = null;
 					if (!StringUtil.isEmpty(timeEndStr)) {
-						timeEnd = DateUtils.getDateFromString(timeEndStr, "yyyy-MM-dd HH:mm:ss z");// 订单支付完成时间
+						timeEnd = DateUtils.getDateFromString(timeEndStr, "yyyy-MM-dd HH:mm:ss 'Etc/GMT'");// 订单支付完成时间
 					}
 					
 					String transactionId = ApplePayUtil.getTransactionId(receiptBean);

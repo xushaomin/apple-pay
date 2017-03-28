@@ -8,12 +8,12 @@ public class AppleReceiptBean implements Serializable {
 	private static final long serialVersionUID = -3566773423244003397L;
 
 	private String receipt_type;
-	private Integer adam_id;
+	private Long adam_id;
 	private Integer app_item_id;
 	private String bundle_id;
 	private String application_version;
-	private Integer download_id;
-	private Integer version_external_identifier;
+	private Long download_id;
+	private Long version_external_identifier;
 	private String receipt_creation_date;
 	private String receipt_creation_date_ms;
 	private String receipt_creation_date_pst;
@@ -34,11 +34,11 @@ public class AppleReceiptBean implements Serializable {
 		this.receipt_type = receipt_type;
 	}
 
-	public Integer getAdam_id() {
+	public Long getAdam_id() {
 		return adam_id;
 	}
 
-	public void setAdam_id(Integer adam_id) {
+	public void setAdam_id(Long adam_id) {
 		this.adam_id = adam_id;
 	}
 
@@ -66,19 +66,19 @@ public class AppleReceiptBean implements Serializable {
 		this.application_version = application_version;
 	}
 
-	public Integer getDownload_id() {
+	public Long getDownload_id() {
 		return download_id;
 	}
 
-	public void setDownload_id(Integer download_id) {
+	public void setDownload_id(Long download_id) {
 		this.download_id = download_id;
 	}
 
-	public Integer getVersion_external_identifier() {
+	public Long getVersion_external_identifier() {
 		return version_external_identifier;
 	}
 
-	public void setVersion_external_identifier(Integer version_external_identifier) {
+	public void setVersion_external_identifier(Long version_external_identifier) {
 		this.version_external_identifier = version_external_identifier;
 	}
 
