@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.appleframework.pay.common</groupId>
 		<artifactId>apple-pay</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 	<artifactId>apple-pay-app-notify</artifactId>
 	<name>apple-pay-app-notify</name>
