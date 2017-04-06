@@ -1,7 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ include file="../../../common/taglib/taglib.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+	<%@include file="../../../common/taglib/taglib.jsp"%>
 <form id="pagerForm" method="post" action="${baseURL }/pay/config/list">
-<%@ include file="../../common/pageParameter.jsp" %>
+    <%@include file="../../common/pageParameter.jsp" %>
 </form>
 <div class="pageHeader">
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${baseURL }/pay/config/list"
@@ -80,5 +81,5 @@
 			<c:if test="${pageBean.totalCount==0}"><tr><td>暂无数据</td></tr></c:if>
 		</tbody>
 	</table>
-	<%@ include file="../../common/pageBar.jsp" %>
+	<%@include file="../../common/pageBar.jsp" %>
 </div>

@@ -42,22 +42,25 @@ import com.appleframework.pay.user.service.RpUserPayConfigService;
 import com.appleframework.pay.user.service.RpUserPayInfoService;
 
 /**
- * 用户支付配置service实现类
- * http://www.appleframework.com
- * @author：Cruise.Xu
+ * 用户支付配置service实现类 http://www.appleframework.com
+ * 
+ * @author：cruise.xu
  */
 @Service("rpUserPayConfigService")
-public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
+public class RpUserPayConfigServiceImpl implements RpUserPayConfigService {
 
 	@Autowired
 	private RpUserPayConfigDao rpUserPayConfigDao;
+	
 	@Autowired
 	private RpPayProductService rpPayProductService;
+	
 	@Autowired
 	private RpPayWayService rpPayWayService;
+	
 	@Autowired
 	private RpUserPayInfoService rpUserPayInfoService;
-	
+
 	@Override
 	public void saveData(RpUserPayConfig rpUserPayConfig) {
 		rpUserPayConfigDao.insert(rpUserPayConfig);
@@ -73,8 +76,9 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 		return rpUserPayConfigDao.getById(id);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public PageBean<RpUserPayConfig> listPage(PageParam pageParam, RpUserPayConfig rpUserPayConfig) {
+	public PageBean listPage(PageParam pageParam, RpUserPayConfig rpUserPayConfig) {
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("productCode", rpUserPayConfig.getProductCode());
 		paramMap.put("userNo", rpUserPayConfig.getUserNo());
@@ -94,57 +98,73 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 	public RpUserPayConfig getByUserNo(String userNo) {
 		return rpUserPayConfigDao.getByUserNo(userNo, PublicEnum.YES.name());
 	}
-	
+
 	/**
 	 * 根据商户编号获取支付配置
+	 * 
 	 * @param userNo
 	 * @param auditStatus
 	 * @return
 	 */
 	@Override
-	public RpUserPayConfig getByUserNo(String userNo, String auditStatus){
+	public RpUserPayConfig getByUserNo(String userNo, String auditStatus) {
 		return rpUserPayConfigDao.getByUserNo(userNo, auditStatus);
 	}
-	
-	
+
 	/**
 	 * 根据支付产品获取已生效数据
 	 */
 	@Override
-	public List<RpUserPayConfig> listByProductCode(String productCode){
+	public List<RpUserPayConfig> listByProductCode(String productCode) {
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("productCode", productCode);
 		paramMap.put("status", PublicStatusEnum.ACTIVE.name());
 		paramMap.put("auditStatus", PublicEnum.YES.name());
 		return rpUserPayConfigDao.listBy(paramMap);
 	}
-	
+
 	/**
 	 * 根据支付产品获取数据
 	 */
 	@Override
-	public List<RpUserPayConfig> listByProductCode(String productCode, String auditStatus){
+	public List<RpUserPayConfig> listByProductCode(String productCode, String auditStatus) {
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("productCode", productCode);
 		paramMap.put("status", PublicStatusEnum.ACTIVE.name());
 		paramMap.put("auditStatus", auditStatus);
 		return rpUserPayConfigDao.listBy(paramMap);
 	}
-	
+
 	/**
 	 * 创建用户支付配置
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void createUserPayConfig(String userNo, String userName, String productCode, String productName, Integer riskDay,
-			String fundIntoType, String isAutoSett, String appId, String merchantId, String partnerKey,
-			String ali_partner, String ali_sellerId, String ali_key, String ali_appid, String ali_rsaPrivateKey, String ali_rsaPublicKey)  throws PayBizException{
-		
+	public void createUserPayConfig(String userNo, String userName, String productCode, String productName,
+			Integer riskDay, String fundIntoType, String isAutoSett, String appId, String merchantId, String partnerKey,
+			String ali_partner, String ali_sellerId, String ali_key, String ali_appid, String ali_rsaPrivateKey,
+			String ali_rsaPublicKey) throws PayBizException {
+
+		createUserPayConfig(userNo, userName, productCode, productName, riskDay, fundIntoType, isAutoSett, appId,
+				merchantId, partnerKey, ali_partner, ali_sellerId, ali_key, ali_appid, ali_rsaPrivateKey,
+				ali_rsaPublicKey, null, null);
+	}
+
+	/**
+	 * 创建用户支付配置
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void createUserPayConfig(String userNo, String userName, String productCode, String productName,
+			Integer riskDay, String fundIntoType, String isAutoSett, String appId, String merchantId, String partnerKey,
+			String ali_partner, String ali_sellerId, String ali_key, String ali_appid, String ali_rsaPrivateKey,
+			String ali_rsaPublicKey, String securityRating, String merchantServerIp) throws PayBizException {
+
 		RpUserPayConfig payConfig = rpUserPayConfigDao.getByUserNo(userNo, null);
-		if(payConfig != null){
-			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_EXIST,"用户支付配置已存在");
+		if (payConfig != null) {
+			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_EXIST, "用户支付配置已存在");
 		}
-		
+
 		RpUserPayConfig rpUserPayConfig = new RpUserPayConfig();
 		rpUserPayConfig.setUserNo(userNo);
 		rpUserPayConfig.setUserName(userName);
@@ -158,21 +178,23 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 		rpUserPayConfig.setPayKey(StringUtil.get32UUID());
 		rpUserPayConfig.setPaySecret(StringUtil.get32UUID());
 		rpUserPayConfig.setId(StringUtil.get32UUID());
+		rpUserPayConfig.setSecurityRating(securityRating);// 安全等级
+		rpUserPayConfig.setMerchantServerIp(merchantServerIp);
 		saveData(rpUserPayConfig);
-		
-		//查询支付产品下有哪些支付方式
+
+		// 查询支付产品下有哪些支付方式
 		List<RpPayWay> payWayList = rpPayWayService.listByProductCode(productCode);
 		Map<String, String> map = new HashMap<String, String>();
-		//过滤重复数据
-		for(RpPayWay payWay : payWayList){
-	        map.put(payWay.getPayWayCode(), payWay.getPayWayName());
+		// 过滤重复数据
+		for (RpPayWay payWay : payWayList) {
+			map.put(payWay.getPayWayCode(), payWay.getPayWayName());
 		}
-		
+
 		for (String key : map.keySet()) {
-			if(key.equals(PayWayEnum.WEIXIN.name())){
-				//创建用户第三方支付信息
+			if (key.equals(PayWayEnum.WEIXIN.name())) {
+				// 创建用户第三方支付信息
 				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(userNo, PayWayEnum.WEIXIN.name());
-				if(rpUserPayInfo == null){
+				if (rpUserPayInfo == null) {
 					rpUserPayInfo = new RpUserPayInfo();
 					rpUserPayInfo.setId(StringUtil.get32UUID());
 					rpUserPayInfo.setCreateTime(new Date());
@@ -185,7 +207,7 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 					rpUserPayInfo.setUserName(userName);
 					rpUserPayInfo.setStatus(PublicStatusEnum.ACTIVE.name());
 					rpUserPayInfoService.saveData(rpUserPayInfo);
-				}else{
+				} else {
 					rpUserPayInfo.setEditTime(new Date());
 					rpUserPayInfo.setAppId(appId);
 					rpUserPayInfo.setMerchantId(merchantId);
@@ -194,11 +216,11 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 					rpUserPayInfo.setPayWayName(PayWayEnum.WEIXIN.getDesc());
 					rpUserPayInfoService.updateData(rpUserPayInfo);
 				}
-				
-			}else if(key.equals(PayWayEnum.ALIPAY.name())){
-				//创建用户第三方支付信息
+
+			} else if (key.equals(PayWayEnum.ALIPAY.name())) {
+				// 创建用户第三方支付信息
 				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(userNo, PayWayEnum.ALIPAY.name());
-				if(rpUserPayInfo == null){
+				if (rpUserPayInfo == null) {
 					rpUserPayInfo = new RpUserPayInfo();
 					rpUserPayInfo.setId(StringUtil.get32UUID());
 					rpUserPayInfo.setCreateTime(new Date());
@@ -214,7 +236,7 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 					rpUserPayInfo.setRsaPrivateKey(ali_rsaPrivateKey);
 					rpUserPayInfo.setRsaPublicKey(ali_rsaPublicKey);
 					rpUserPayInfoService.saveData(rpUserPayInfo);
-				}else{
+				} else {
 					rpUserPayInfo.setEditTime(new Date());
 					rpUserPayInfo.setAppId(ali_partner);
 					rpUserPayInfo.setMerchantId(ali_sellerId);
@@ -228,61 +250,77 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 				}
 			}
 		}
-		
-		
-		
+
 	}
-	
+
 	/**
 	 * 删除支付产品
+	 * 
 	 * @param userNo
 	 */
 	@Override
-	public void deleteUserPayConfig(String userNo) throws PayBizException{
-		
+	public void deleteUserPayConfig(String userNo) throws PayBizException {
+
 		RpUserPayConfig rpUserPayConfig = rpUserPayConfigDao.getByUserNo(userNo, null);
-		if(rpUserPayConfig == null){
-			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_NOT_EXIST,"用户支付配置不存在");
+		if (rpUserPayConfig == null) {
+			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_NOT_EXIST, "用户支付配置不存在");
 		}
-		
+
 		rpUserPayConfig.setStatus(PublicStatusEnum.UNACTIVE.name());
 		rpUserPayConfig.setEditTime(new Date());
 		updateData(rpUserPayConfig);
 	}
-	
+
 	/**
 	 * 修改用户支付配置
 	 */
 	@Override
-	public void updateUserPayConfig(String userNo, String productCode, String productName, Integer riskDay, String fundIntoType,
-			String isAutoSett, String appId, String merchantId, String partnerKey,
-			String ali_partner, String ali_sellerId, String ali_key, String ali_appid, String ali_rsaPrivateKey, String ali_rsaPublicKey)  throws PayBizException{
+	public void updateUserPayConfig(String userNo, String productCode, String productName, Integer riskDay,
+			String fundIntoType, String isAutoSett, String appId, String merchantId, String partnerKey,
+			String ali_partner, String ali_sellerId, String ali_key, String ali_appid, String ali_rsaPrivateKey,
+			String ali_rsaPublicKey) throws PayBizException {
+
+		updateUserPayConfig(userNo, productCode, productName, riskDay, fundIntoType, isAutoSett, appId, merchantId,
+				partnerKey, ali_partner, ali_sellerId, ali_key, ali_appid, ali_rsaPrivateKey, ali_rsaPublicKey, null,
+				null);
+	}
+
+	/**
+	 * 修改用户支付配置
+	 */
+	@Override
+	public void updateUserPayConfig(String userNo, String productCode, String productName, Integer riskDay,
+			String fundIntoType, String isAutoSett, String appId, String merchantId, String partnerKey,
+			String ali_partner, String ali_sellerId, String ali_key, String ali_appid, String ali_rsaPrivateKey,
+			String ali_rsaPublicKey, String securityRating, String merchantServerIp) throws PayBizException {
 		RpUserPayConfig rpUserPayConfig = rpUserPayConfigDao.getByUserNo(userNo, null);
-		if(rpUserPayConfig == null){
-			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_NOT_EXIST,"用户支付配置不存在");
+		if (rpUserPayConfig == null) {
+			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_NOT_EXIST, "用户支付配置不存在");
 		}
-		
+
 		rpUserPayConfig.setProductCode(productCode);
 		rpUserPayConfig.setProductName(productName);
 		rpUserPayConfig.setRiskDay(riskDay);
 		rpUserPayConfig.setFundIntoType(fundIntoType);
 		rpUserPayConfig.setIsAutoSett(isAutoSett);
 		rpUserPayConfig.setEditTime(new Date());
+		rpUserPayConfig.setSecurityRating(securityRating);// 安全等级
+		rpUserPayConfig.setMerchantServerIp(merchantServerIp);
 		updateData(rpUserPayConfig);
-		
-		//查询支付产品下有哪些支付方式
+
+		// 查询支付产品下有哪些支付方式
 		List<RpPayWay> payWayList = rpPayWayService.listByProductCode(productCode);
 		Map<String, String> map = new HashMap<String, String>();
-		//过滤重复数据
-		for(RpPayWay payWay : payWayList){
+		// 过滤重复数据
+		for (RpPayWay payWay : payWayList) {
 			map.put(payWay.getPayWayCode(), payWay.getPayWayName());
 		}
-				
+
 		for (String key : map.keySet()) {
-			if(key.equals(PayWayEnum.WEIXIN.name())){
-				//创建用户第三方支付信息
+			if (key.equals(PayWayEnum.WEIXIN.name())) {
+				// 创建用户第三方支付信息
 				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(userNo, PayWayEnum.WEIXIN.name());
-				if(rpUserPayInfo == null){
+				if (rpUserPayInfo == null) {
 					rpUserPayInfo = new RpUserPayInfo();
 					rpUserPayInfo.setId(StringUtil.get32UUID());
 					rpUserPayInfo.setCreateTime(new Date());
@@ -295,7 +333,7 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 					rpUserPayInfo.setUserName(rpUserPayConfig.getUserName());
 					rpUserPayInfo.setStatus(PublicStatusEnum.ACTIVE.name());
 					rpUserPayInfoService.saveData(rpUserPayInfo);
-				}else{
+				} else {
 					rpUserPayInfo.setEditTime(new Date());
 					rpUserPayInfo.setAppId(appId);
 					rpUserPayInfo.setMerchantId(merchantId);
@@ -304,11 +342,11 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 					rpUserPayInfo.setPayWayName(PayWayEnum.WEIXIN.getDesc());
 					rpUserPayInfoService.updateData(rpUserPayInfo);
 				}
-						
-			}else if(key.equals(PayWayEnum.ALIPAY.name())){
-				//创建用户第三方支付信息
+
+			} else if (key.equals(PayWayEnum.ALIPAY.name())) {
+				// 创建用户第三方支付信息
 				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(userNo, PayWayEnum.ALIPAY.name());
-				if(rpUserPayInfo == null){
+				if (rpUserPayInfo == null) {
 					rpUserPayInfo = new RpUserPayInfo();
 					rpUserPayInfo.setId(StringUtil.get32UUID());
 					rpUserPayInfo.setCreateTime(new Date());
@@ -324,7 +362,7 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 					rpUserPayInfo.setRsaPrivateKey(ali_rsaPrivateKey);
 					rpUserPayInfo.setRsaPublicKey(ali_rsaPublicKey);
 					rpUserPayInfoService.saveData(rpUserPayInfo);
-				}else{
+				} else {
 					rpUserPayInfo.setEditTime(new Date());
 					rpUserPayInfo.setAppId(ali_partner);
 					rpUserPayInfo.setMerchantId(ali_sellerId);
@@ -339,43 +377,46 @@ public class RpUserPayConfigServiceImpl implements RpUserPayConfigService{
 			}
 		}
 	}
-	
+
 	/**
 	 * 审核
+	 * 
 	 * @param userNo
 	 * @param auditStatus
 	 */
 	@Override
-	public void audit(String userNo, String auditStatus){
+	public void audit(String userNo, String auditStatus) {
 		RpUserPayConfig rpUserPayConfig = getByUserNo(userNo, null);
-		if(rpUserPayConfig == null){
-			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_NOT_EXIST,"支付配置不存在！");
+		if (rpUserPayConfig == null) {
+			throw new PayBizException(PayBizException.USER_PAY_CONFIG_IS_NOT_EXIST, "支付配置不存在！");
 		}
-		
-		if(auditStatus.equals(PublicEnum.YES.name())){
-			//检查是否已关联生效的支付产品
-			RpPayProduct rpPayProduct = rpPayProductService.getByProductCode(rpUserPayConfig.getProductCode(), PublicEnum.YES.name());
-			if(rpPayProduct == null){
-				throw new PayBizException(PayBizException.PAY_PRODUCT_IS_NOT_EXIST,"未关联已生效的支付产品，无法操作！");
+
+		if (auditStatus.equals(PublicEnum.YES.name())) {
+			// 检查是否已关联生效的支付产品
+			RpPayProduct rpPayProduct = rpPayProductService.getByProductCode(rpUserPayConfig.getProductCode(),
+					PublicEnum.YES.name());
+			if (rpPayProduct == null) {
+				throw new PayBizException(PayBizException.PAY_PRODUCT_IS_NOT_EXIST, "未关联已生效的支付产品，无法操作！");
 			}
-			
-			//检查是否已设置第三方支付信息
+
+			// 检查是否已设置第三方支付信息
 		}
 		rpUserPayConfig.setAuditStatus(auditStatus);
 		rpUserPayConfig.setEditTime(new Date());
 		updateData(rpUserPayConfig);
 	}
-	
+
 	/**
 	 * 根据商户key获取已生效的支付配置
+	 * 
 	 * @param payKey
 	 * @return
 	 */
-	public RpUserPayConfig getByPayKey(String payKey){
-	    Map<String , Object> paramMap = new HashMap<String , Object>();
-	    paramMap.put("payKey", payKey);
-	    paramMap.put("status", PublicStatusEnum.ACTIVE.name());
-	    paramMap.put("auditStatus", PublicEnum.YES.name());
-	    return rpUserPayConfigDao.getBy(paramMap);
+	public RpUserPayConfig getByPayKey(String payKey) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("payKey", payKey);
+		paramMap.put("status", PublicStatusEnum.ACTIVE.name());
+		paramMap.put("auditStatus", PublicEnum.YES.name());
+		return rpUserPayConfigDao.getBy(paramMap);
 	}
 }

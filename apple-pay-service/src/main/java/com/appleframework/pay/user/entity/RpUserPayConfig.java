@@ -19,6 +19,7 @@ import java.io.Serializable;
 
 import com.appleframework.pay.common.core.entity.BaseEntity;
 import com.appleframework.pay.common.core.enums.PublicEnum;
+import com.appleframework.pay.common.core.enums.SecurityRatingEnum;
 import com.appleframework.pay.user.enums.FundInfoTypeEnum;
 
 /**
@@ -27,7 +28,6 @@ import com.appleframework.pay.user.enums.FundInfoTypeEnum;
  * @author：Cruise.Xu
  */
 public class RpUserPayConfig extends BaseEntity implements Serializable {
-
 
     private String auditStatus;
 
@@ -48,6 +48,13 @@ public class RpUserPayConfig extends BaseEntity implements Serializable {
     private String fundIntoType;
 
     private String paySecret;
+    
+    /** 安全等级 **/
+    private String securityRating = SecurityRatingEnum.MD5.name();
+
+    /**商户服务器IP **/
+    private String merchantServerIp;
+
 
     public String getPaySecret() {
         return paySecret;
@@ -137,5 +144,21 @@ public class RpUserPayConfig extends BaseEntity implements Serializable {
     
     public String getFundIntoTypeDesc() {
     	return FundInfoTypeEnum.getEnum(this.getFundIntoType()).getDesc();
+    }
+    
+    public String getSecurityRating() {
+        return securityRating;
+    }
+
+    public void setSecurityRating(String securityRating) {
+        this.securityRating = securityRating;
+    }
+
+    public String getMerchantServerIp() {
+        return merchantServerIp;
+    }
+
+    public void setMerchantServerIp(String merchantServerIp) {
+        this.merchantServerIp = merchantServerIp;
     }
 }

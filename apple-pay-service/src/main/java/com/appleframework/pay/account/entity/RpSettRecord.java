@@ -21,6 +21,7 @@ import java.util.Date;
 import com.appleframework.pay.account.enums.SettModeTypeEnum;
 import com.appleframework.pay.account.enums.SettRecordStatusEnum;
 import com.appleframework.pay.common.core.entity.BaseEntity;
+import com.appleframework.pay.common.core.utils.DateUtils;
 import com.appleframework.pay.user.enums.BankAccountTypeEnum;
 
 /**
@@ -547,6 +548,10 @@ public class RpSettRecord extends BaseEntity {
 	
     public String getSettStatusDesc() {
     	return SettRecordStatusEnum.getEnum(this.getSettStatus()).getDesc();
+    }
+    
+    public String getCreateTimeDesc() {
+    	return DateUtils.formatDate(this.getCreateTime(), "yyyy-MM-dd HH:mm:ss");
     }
 
 }

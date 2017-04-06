@@ -154,7 +154,7 @@ public class ApplePayController  extends BaseController{
             
             String message = null;
 			try {
-				message = HttpUtils.post("http://127.0.0.1:8280/web-gateway/appPay/jsonPay", paramMap);
+				message = HttpUtils.post("http://127.0.0.1:8080/web-gateway/appPay/jsonPay", paramMap);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

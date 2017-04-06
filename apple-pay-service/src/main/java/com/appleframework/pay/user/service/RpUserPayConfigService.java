@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2102 RonCoo(http://www.appleframework.com) Group.
+ * Copyright 2015-2102 RonCoo(http://www.roncoo.com) Group.
  *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import com.appleframework.pay.user.exception.PayBizException;
 
 /**
  *  用户支付配置service接口
- * http://www.appleframework.com
- * @author：Cruise.Xu
+ * 龙果学院：www.roncoo.com
+ * @author：zenghao
  */
 public interface RpUserPayConfigService{
 	
@@ -54,7 +54,8 @@ public interface RpUserPayConfigService{
 	 * @param pageParam
 	 * @return
 	 */
-	PageBean<RpUserPayConfig> listPage(PageParam pageParam, RpUserPayConfig rpUserPayConfig);
+	@SuppressWarnings("rawtypes")
+	PageBean listPage(PageParam pageParam, RpUserPayConfig rpUserPayConfig);
 
 	/**
 	 * 根据商户编号获取已生效的支付配置
@@ -87,7 +88,14 @@ public interface RpUserPayConfigService{
 	void createUserPayConfig(String userNo, String userName, String productCode, String productName, Integer riskDay, String fundIntoType,
 			String isAutoSett, String appId, String merchantId, String partnerKey, String ali_partner, String ali_sellerId, String ali_key,
 			String ali_appid, String ali_rsaPrivateKey, String ali_rsaPublicKey)  throws PayBizException;
-	
+
+	/**
+	 * 创建用户支付配置
+	 */
+	void createUserPayConfig(String userNo, String userName, String productCode, String productName, Integer riskDay, String fundIntoType,
+			String isAutoSett, String appId, String merchantId, String partnerKey, String ali_partner, String ali_sellerId, String ali_key,
+			String ali_appid, String ali_rsaPrivateKey, String ali_rsaPublicKey, String securityRating , String merchantServerIp)  throws PayBizException;
+
 	/**
 	 * 删除支付产品
 	 * @param userNo
@@ -100,6 +108,13 @@ public interface RpUserPayConfigService{
 	void updateUserPayConfig(String userNo, String productCode, String productName, Integer riskDay, String fundIntoType,
 			String isAutoSett, String appId, String merchantId, String partnerKey, String ali_partner, String ali_sellerId, String ali_key,
 			String ali_appid, String ali_rsaPrivateKey, String ali_rsaPublicKey)  throws PayBizException;
+
+	/**
+	 * 修改用户支付配置
+	 */
+	void updateUserPayConfig(String userNo, String productCode, String productName, Integer riskDay, String fundIntoType,
+			String isAutoSett, String appId, String merchantId, String partnerKey, String ali_partner, String ali_sellerId, String ali_key,
+			String ali_appid, String ali_rsaPrivateKey, String ali_rsaPublicKey, String securityRating , String merchantServerIp)  throws PayBizException;
 
 	/**
 	 * 审核

@@ -1,8 +1,23 @@
 package com.appleframework.pay.controller;
 
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.alibaba.fastjson.JSONObject;
 import com.appleframework.pay.common.core.utils.DateUtils;
 import com.appleframework.pay.controller.common.BaseController;
+import com.appleframework.pay.service.CnpPayService;
 import com.appleframework.pay.trade.exception.TradeBizException;
 import com.appleframework.pay.trade.service.RpTradePaymentManagerService;
 import com.appleframework.pay.trade.utils.MerchantApiUtil;
@@ -10,29 +25,18 @@ import com.appleframework.pay.trade.vo.F2FPayResultVo;
 import com.appleframework.pay.user.entity.RpUserPayConfig;
 import com.appleframework.pay.user.exception.UserBizException;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletResponse;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
- * <b>功能说明:
+ * <b>功能说明:扫码支付控制类
  * </b>
- *
- * @author Peter
- *         <a href="http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
+ * @author  Cruise.Xu
+ * <a href="http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
  */
 @Controller
 @RequestMapping(value = "/f2fPay")
 public class F2FPayController extends BaseController {
+	
     private static final Logger LOG = LoggerFactory.getLogger(F2FPayController.class) ;
 
     @Autowired
@@ -41,13 +45,16 @@ public class F2FPayController extends BaseController {
     @Autowired
     private RpUserPayConfigService rpUserPayConfigService;
 
+    @Autowired
+    private CnpPayService cnpPayService;
+
     /**
      * 条码支付,商户通过前置设备获取到用户支付授权码后,请求支付网关支付.
      *
      * @return
      */
     @RequestMapping("/doPay")
-    public void initPay(HttpServletResponse httpServletResponse) {
+    public void initPay(HttpServletResponse httpServletResponse , HttpServletRequest httpServletRequest) {
         Map<String, Object> paramMap = new HashMap<String, Object>();
 
         //获取商户传入参数
@@ -91,6 +98,8 @@ public class F2FPayController extends BaseController {
         if (rpUserPayConfig == null) {
             throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
         }
+
+        cnpPayService.checkIp( rpUserPayConfig ,  httpServletRequest);//ip校验
 
         if (!MerchantApiUtil.isRightSign(paramMap, rpUserPayConfig.getPaySecret(), sign)) {
             throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "订单签名异常");

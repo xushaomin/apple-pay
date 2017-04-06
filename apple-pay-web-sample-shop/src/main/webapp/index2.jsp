@@ -51,10 +51,10 @@
         </form>
       </li>
       <li><img src="${path}images/wang.png" alt="网关支付" />
-        <form action="${path}applePay/scanPay" method="post">
+        <form action="${path}applePay/jsonPay" method="post">
           <input type="hidden" name="productName" value="网关支付产品测试" /><br />
           <input type="hidden" name="orderPrice" value="0.1" /><br />
-          <input type="hidden" name="payWayCode" value="">
+          <input type="hidden" name="payWayCode" value="APPLE">
           <input type="hidden" name="remark" value="网关支付备注信息" /><br />
           <p class="pay_btn">
             <input type="submit" value="0.1元支付体验" />

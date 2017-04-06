@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import com.appleframework.pay.common.core.enums.PayWayEnum;
 import com.appleframework.pay.common.core.utils.DateUtils;
 import com.appleframework.pay.common.core.utils.StringUtil;
 import com.appleframework.pay.controller.common.BaseController;
+import com.appleframework.pay.service.CnpPayService;
 import com.appleframework.pay.trade.exception.TradeBizException;
 import com.appleframework.pay.trade.service.RpTradePaymentManagerService;
 import com.appleframework.pay.trade.service.RpTradePaymentQueryService;
@@ -49,12 +51,13 @@ import com.appleframework.pay.utils.JsonUtils;
 /**
  * <b>功能说明:扫码支付控制类
  * </b>
- * @author  Cruise.Xu
- * <a href="http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
+ * @author  Peter
+ * <a href="http://www.roncoo.com">龙果学院(www.roncoo.com)</a>
  */
 @Controller
 @RequestMapping(value = "/scanPay")
 public class ScanPayController extends BaseController {
+
 
     @Autowired
     private RpTradePaymentManagerService rpTradePaymentManagerService;
@@ -65,6 +68,9 @@ public class ScanPayController extends BaseController {
     @Autowired
     private RpUserPayConfigService rpUserPayConfigService;
 
+    @Autowired
+    private CnpPayService cnpPayService;
+
     /**
      * 扫码支付,预支付页面
      * 用户进行扫码支付时,商户后台调用该接口
@@ -74,7 +80,7 @@ public class ScanPayController extends BaseController {
      * @return
      */
     @RequestMapping("/initPay")
-    public String initPay(Model model){
+    public String initPay(Model model , HttpServletRequest httpServletRequest){
         Map<String , Object> paramMap = new HashMap<String , Object>();
 
         //获取商户传入参数
@@ -124,6 +130,8 @@ public class ScanPayController extends BaseController {
             throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
         }
 
+        cnpPayService.checkIp( rpUserPayConfig ,  httpServletRequest);//ip校验
+
         if (!MerchantApiUtil.isRightSign(paramMap,rpUserPayConfig.getPaySecret(),sign)){
             throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
         }
@@ -166,7 +174,7 @@ public class ScanPayController extends BaseController {
         model.addAttribute("codeUrl",scanPayResultVo.getCodeUrl());//支付二维码
 
         if (PayWayEnum.WEIXIN.name().equals(scanPayResultVo.getPayWayCode())){
-            model.addAttribute("queryUrl", PropertyConfigurer.getString("weixinpay.order_query_url") + "?orderNO=" + orderNo + "&payKey=" + payKey);
+            model.addAttribute("queryUrl", PropertyConfigurer.getString("order_query_url") + "?orderNO=" + orderNo + "&payKey=" + payKey);
             model.addAttribute("productName",scanPayResultVo.getProductName());//产品名称
             model.addAttribute("orderPrice",scanPayResultVo.getOrderAmount());//订单价格
             return "weixinPayScanPay";
