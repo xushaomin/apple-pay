@@ -4,7 +4,7 @@
 
 	<groupId>com.appleframework.pay.common</groupId>
 	<artifactId>apple-pay</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<packaging>pom</packaging>
 
 	<name>apple-pay</name>
@@ -32,6 +32,8 @@
 		<module>apple-pay-service</module>
 		<!-- 商户后台 -->
 		<module>apple-pay-web-merchant</module>
+		<!-- 商户订单通知 -->
+		<module>apple-pay-app-order-polling</module>
 	</modules>
 
 	<!-- 配置maven地址 -->
@@ -65,7 +67,7 @@
 		<mysql.version>5.1.30</mysql.version>
 		<dbcp.version>1.4</dbcp.version>
 		<jstl.version>1.2</jstl.version>
-		<druid.version>1.0.19</druid.version>
+		<druid.version>1.0.29</druid.version>
 		<fastjson.version>1.2.11</fastjson.version>
 		<javaee-api.version>7.0</javaee-api.version>
 		<commons-lang.version>2.6</commons-lang.version>
