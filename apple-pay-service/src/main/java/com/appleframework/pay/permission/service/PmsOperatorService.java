@@ -15,12 +15,9 @@
  */
 package com.appleframework.pay.permission.service;
 
-import java.util.List;
-
 import com.appleframework.pay.common.core.page.PageBean;
 import com.appleframework.pay.common.core.page.PageParam;
 import com.appleframework.pay.permission.entity.PmsOperator;
-import com.appleframework.pay.permission.entity.PmsOperatorRole;
 
 /**
  * 操作员service接口

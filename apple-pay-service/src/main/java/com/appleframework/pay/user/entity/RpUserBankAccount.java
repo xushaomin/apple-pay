@@ -24,6 +24,8 @@ import com.appleframework.pay.common.core.entity.BaseEntity;
  */
 public class RpUserBankAccount extends BaseEntity {
 
+	private static final long serialVersionUID = 1443311561557524141L;
+
 	/** 银行卡开户所在省 **/
 	private String province;
 

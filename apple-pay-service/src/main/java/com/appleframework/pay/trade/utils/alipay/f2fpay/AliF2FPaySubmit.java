@@ -1,12 +1,18 @@
 package com.appleframework.pay.trade.utils.alipay.f2fpay;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.lang.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -26,8 +32,17 @@ import com.alipay.trade.service.impl.AlipayMonitorServiceImpl;
 import com.alipay.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.trade.service.impl.AlipayTradeWithHBServiceImpl;
 import com.alipay.trade.utils.Utils;
+
+import com.appleframework.pay.common.core.exception.BizException;
+import com.appleframework.pay.reconciliation.utils.alipay.AlipayCore;
 import com.appleframework.pay.trade.entity.GoodsDetails;
 import com.appleframework.pay.trade.enums.TradeStatusEnum;
+import com.appleframework.pay.trade.utils.alipay.config.AlipayConfigUtil;
+import com.appleframework.pay.trade.utils.alipay.sign.MD5;
+import com.appleframework.pay.trade.utils.alipay.util.httpClient.HttpProtocolHandler;
+import com.appleframework.pay.trade.utils.alipay.util.httpClient.HttpRequest;
+import com.appleframework.pay.trade.utils.alipay.util.httpClient.HttpResponse;
+import com.appleframework.pay.trade.utils.alipay.util.httpClient.HttpResultType;
 import com.appleframework.pay.user.enums.FundInfoTypeEnum;
 
 /**
@@ -41,6 +56,8 @@ import com.appleframework.pay.user.enums.FundInfoTypeEnum;
 public class AliF2FPaySubmit {
 
     private static final Logger LOG = LoggerFactory.getLogger(AliF2FPaySubmit.class);
+    
+	private static final String ALIPAY_GATEWAY_NEW = "https://mapi.alipay.com/gateway.do?";
 
     private  AlipayTradeService tradeService;
 
@@ -226,6 +243,124 @@ public class AliF2FPaySubmit {
             LOG.info("body:" + response.getBody());
         }
     }
+    
+    
+    public static Map<String, String> orderQuery(String outTradeNo) {
+		Map<String, String> sParaTemp = new HashMap<>();
+		sParaTemp.put("service", "single_trade_query");
+		sParaTemp.put("partner", AlipayConfigUtil.partner);
+		sParaTemp.put("_input_charset", AlipayConfigUtil.input_charset);
+		sParaTemp.put("out_trade_no", outTradeNo);
+		Map<String, String> sPara = buildRequestPara(sParaTemp);
+		HttpProtocolHandler httpProtocolHandler = HttpProtocolHandler.getInstance();
+		HttpRequest request = new HttpRequest(HttpResultType.BYTES);
+		// 设置编码集
+		request.setCharset(AlipayConfigUtil.input_charset);
+		request.setParameters(generatNameValuePair(sPara));
+		request.setUrl(ALIPAY_GATEWAY_NEW + "_input_charset=" + AlipayConfigUtil.input_charset);
+		String strResult = null;
+		try {
+			HttpResponse response = httpProtocolHandler.execute(request, "", "");
+			if (response == null) {
+				return null;
+			}
+			strResult = response.getStringResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return xmlStrToMap(strResult);
+	}
+
+	/**
+	 * 生成要请求给支付宝的参数数组
+	 * 
+	 * @param sParaTemp
+	 *            请求前的参数数组
+	 * @return 要请求的参数数组
+	 */
+	private static Map<String, String> buildRequestPara(Map<String, String> sParaTemp) {
+		// 除去数组中的空值和签名参数
+		Map<String, String> sPara = AlipayCore.paraFilter(sParaTemp);
+		// 生成签名结果
+		String mysign = buildRequestMysign(sPara);
+
+		// 签名结果与签名方式加入请求提交参数组中
+		sPara.put("sign", mysign);
+		sPara.put("sign_type", AlipayConfigUtil.sign_type);
+
+		return sPara;
+	}
+
+	/**
+	 * 生成签名结果
+	 * 
+	 * @param sPara
+	 *            要签名的数组
+	 * @return 签名结果字符串
+	 */
+	public static String buildRequestMysign(Map<String, String> sPara) {
+		String prestr = AlipayCore.createLinkString(sPara); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+		String mysign = "";
+		if (AlipayConfigUtil.sign_type.equals("MD5")) {
+			mysign = MD5.sign(prestr, AlipayConfigUtil.key, AlipayConfigUtil.input_charset);
+		}
+		return mysign;
+	}
+
+	/**
+	 * MAP类型数组转换成NameValuePair类型
+	 * 
+	 * @param properties
+	 *            MAP类型数组
+	 * @return NameValuePair类型数组
+	 */
+	private static NameValuePair[] generatNameValuePair(Map<String, String> properties) {
+		NameValuePair[] nameValuePair = new NameValuePair[properties.size()];
+		int i = 0;
+		for (Map.Entry<String, String> entry : properties.entrySet()) {
+			nameValuePair[i++] = new NameValuePair(entry.getKey(), entry.getValue());
+		}
+
+		return nameValuePair;
+	}
+
+	/**
+	 * 解析xml
+	 * @param resultStr
+	 * @return
+	 */
+	public static Map<String, String> xmlStrToMap(String resultStr) {
+		HashMap<String, String> resultMap = new HashMap<>();
+		try {
+			SAXReader saxReader = new SAXReader();
+			Document doc = saxReader.read(new ByteArrayInputStream(resultStr.getBytes()));
+			Element root = doc.getRootElement();
+			Element isSuccess = root.element("is_success");
+			if ("F".equals(isSuccess.getText())) {
+				resultMap.put(isSuccess.getName(), isSuccess.getText());
+				return resultMap;
+			}
+			Element trade = root.element("response").element("trade");
+			@SuppressWarnings("unchecked")
+			List<Element> es = trade.elements();
+			for (Element e : es) {
+				resultMap.put(e.getName(), e.getText());
+			}
+			String sign = buildRequestMysign(resultMap);
+			if (!sign.equals(root.element("sign").getText())) {
+				LOG.error("支付宝订单查询验签失败");
+				throw new BizException("验签失败");
+			}
+			resultMap.put(isSuccess.getName(), isSuccess.getText());
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return resultMap;
+	}
+
+	public static void main(String[] args) {
+		System.out.println("查询结果：" + orderQuery("66662017042011056926").toString());
+	}
 
 
 }

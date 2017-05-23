@@ -3,7 +3,6 @@ package com.appleframework.pay.permission.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.appleframework.pay.account.exception.AccountBizException;
 import com.appleframework.pay.common.core.exception.BizException;
 
 /**
@@ -14,7 +13,9 @@ import com.appleframework.pay.common.core.exception.BizException;
  * @author  Cruise.Xu
  */
 public class PermissionException extends BizException {
+	
 	private static final long serialVersionUID = -5371846727040729628L;
+	
 	private static final Logger logger = LoggerFactory.getLogger(PermissionException.class);
 	/** 该用户没有分配菜单权限 */
 	public static final Integer PERMISSION_USER_NOT_MENU = 1001;

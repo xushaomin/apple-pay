@@ -48,6 +48,7 @@ import com.appleframework.pay.user.service.RpUserPayConfigService;
 
 @Service("rpTradePaymentQueryService")
 public class RpTradePaymentQueryServiceImpl implements RpTradePaymentQueryService {
+	
 	@Autowired
 	private RpTradePaymentRecordDao rpTradePaymentRecordDao;
 

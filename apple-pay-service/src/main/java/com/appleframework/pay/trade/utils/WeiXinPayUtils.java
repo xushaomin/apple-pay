@@ -15,6 +15,7 @@
  */
 package com.appleframework.pay.trade.utils;
 
+import com.appleframework.config.core.PropertyConfigurer;
 import com.appleframework.pay.common.core.utils.StringUtil;
 import com.appleframework.pay.trade.entity.weixinpay.WeiXinPrePay;
 import com.appleframework.pay.trade.enums.weixinpay.WeiXinTradeTypeEnum;
@@ -331,5 +332,43 @@ public class WeiXinPayUtils {
 
         return map;
     }
+    
+    /**
+	 * 订单查询
+	 * 
+	 * @param outTradeNo
+	 * @return
+	 */
+	public static Map<String, Object> orderQuery(String outTradeNo) {
+        String appid = PropertyConfigurer.getString("weixinpay.appId");
+        String partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
+        
+		Random random = new Random();
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("appid", appid);
+		paramMap.put("mch_id", appid);
+		String nonce_str = "";
+		for (int i = 0; i < 31; i++) {
+			nonce_str += random.nextInt(10);
+		}
+		paramMap.put("nonce_str", nonce_str);
+		paramMap.put("out_trade_no", outTradeNo);
+		String signStr = getStringByMap(paramMap) + "&key=" + partnerKey;
+		paramMap.put("sign", MD5Util.encode(signStr).toUpperCase());
+		Set<String> ks = paramMap.keySet();
+		StringBuilder sb = new StringBuilder("<xml>");
+		for (String key : ks) {
+			sb.append("<" + key + ">" + paramMap.get(key) + "</" + key + ">");
+		}
+		sb.append("</xml>");
+		Map<String, Object> resultMap = httpXmlRequest("https://api.mch.weixin.qq.com/pay/orderquery", "POST",
+				sb.toString());
+		return resultMap;
+	}
+
+	public static void main(String[] args) {
+		Map<String, Object> resultMap = orderQuery("66662017042011056928");
+		System.out.println("回调结果：" + resultMap.toString());
+	}
 
 }

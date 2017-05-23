@@ -29,6 +29,8 @@ import com.appleframework.pay.common.core.entity.BaseEntity;
  */
 public class RpAccountCheckBatch extends BaseEntity {
 
+	private static final long serialVersionUID = 1L;
+
 	// 对账批次号
 	private String batchNo;
 

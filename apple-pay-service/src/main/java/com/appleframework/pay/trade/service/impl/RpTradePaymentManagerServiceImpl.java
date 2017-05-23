@@ -1341,4 +1341,52 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
         return weiXinPrePay;
     }
+    
+    /**
+	 * 处理交易记录 如果交易记录是成功或者本地未支付,查询上游已支付,返回TRUE 如果上游支付结果为未支付,返回FALSE
+	 *
+	 * @param bankOrderNo
+	 *            银行订单号
+	 * @return
+	 */
+	@Override
+	public boolean processingTradeRecord(String bankOrderNo) {
+
+		RpTradePaymentRecord byBankOrderNo = rpTradePaymentRecordDao.getByBankOrderNo(bankOrderNo);
+		if (byBankOrderNo == null) {
+			LOG.info("不存在该银行订单号[{}]对应的交易记录", bankOrderNo);
+			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "非法订单号");
+		}
+
+		if (!TradeStatusEnum.WAITING_PAYMENT.name().equals(byBankOrderNo.getStatus())) {
+			LOG.info("该银行订单号[{}]对应的交易记录状态为:{},不需要再处理", bankOrderNo, byBankOrderNo.getStatus());
+			return true;
+		} else {
+			// 判断微信 支付宝 交易类型
+			if (byBankOrderNo.getPayWayCode().equals(PayWayEnum.WEIXIN.name())) {
+				Map<String, Object> resultMap = WeiXinPayUtils.orderQuery(byBankOrderNo.getBankOrderNo());
+				Object returnCode = resultMap.get("return_code");
+				// 查询失败
+				if (null == returnCode || "FAIL".equals(returnCode)) {
+					return false;
+				}
+				// 当trade_state为SUCCESS时才返回result_code
+				if ("SUCCESS".equals(resultMap.get("trade_state"))) {
+					completeSuccessOrder(byBankOrderNo, byBankOrderNo.getBankTrxNo(), new Date(), "订单交易成功");
+					return true;
+				}
+			} else if (byBankOrderNo.getPayWayCode().equals(PayWayEnum.ALIPAY.name())) {
+				Map<String, String> resultMap = AliF2FPaySubmit.orderQuery(byBankOrderNo.getBankOrderNo());
+				if (resultMap.isEmpty() || !"T".equals(resultMap.get("is_success"))) {
+					return false;
+				}
+				// 当返回状态为“TRADE_FINISHED”交易成功结束和“TRADE_SUCCESS”支付成功时更新交易状态
+				if ("TRADE_SUCCESS".equals(resultMap.get("trade_status")) || "TRADE_FINISHED".equals(resultMap.get("trade_status"))) {
+					completeSuccessOrder(byBankOrderNo, byBankOrderNo.getBankTrxNo(), new Date(), "订单交易成功");
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 }

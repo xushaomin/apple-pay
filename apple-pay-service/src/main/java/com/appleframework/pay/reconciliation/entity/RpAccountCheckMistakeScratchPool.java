@@ -28,6 +28,8 @@ import com.appleframework.pay.common.core.entity.BaseEntity;
  * @author  Cruise.Xu
  */
 public class RpAccountCheckMistakeScratchPool extends BaseEntity {
+	
+	private static final long serialVersionUID = 1L;
 
 	/** 商品名称 **/
 	private String productName;
