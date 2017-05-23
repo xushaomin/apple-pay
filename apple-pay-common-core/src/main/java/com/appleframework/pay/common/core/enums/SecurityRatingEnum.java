@@ -1,7 +1,7 @@
 package com.appleframework.pay.common.core.enums;
 
 /*
- * Copyright 2015-2102 RonCoo(http://www.appleframework.com) Group.
+ * Copyright 2016-2102 Appleframework(http://www.appleframework.com) Group.
  *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
