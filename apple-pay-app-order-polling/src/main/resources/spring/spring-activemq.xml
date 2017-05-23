@@ -14,9 +14,9 @@
 
 	<!-- 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供-->
 	<bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-		<property name="brokerURL" value="${mq.brokerURL}"/>
-		<property name="userName" value="${mq.userName}"></property>
-		<property name="password" value="${mq.password}"></property>
+		<property name="brokerURL" value="${mq.brokerURL}" />
+		<property name="userName" value="${mq.userName}" />
+		<property name="password" value="${mq.password}" />
 	</bean>
 
 	<bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
@@ -33,14 +33,14 @@
 	<!--这个是队列目的地-->
 	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">
 		<constructor-arg>
-			<value>${orderQueryQueueName.query}</value>
+			<value>${mq.queue.query}</value>
 		</constructor-arg>
 	</bean>
 	<!-- 消息监听器 -->
-	<bean id="pollingMessageListener" class="com.appleframework.pay.app.polling.listener.PollingMessageListener"/>
+	<bean id="pollingMessageListener" class="com.appleframework.pay.app.polling.listener.PollingMessageListener" />
+	
 	<!-- 消息监听容器 -->
-	<bean id="jmsContainer"
-		  class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<property name="connectionFactory" ref="connectionFactory" />
 		<property name="destination" ref="queueDestination" />
 		<property name="messageListener" ref="pollingMessageListener" />
