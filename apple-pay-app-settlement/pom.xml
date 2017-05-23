@@ -5,7 +5,7 @@
   <parent>
 		<groupId>com.appleframework.pay.common</groupId>
 		<artifactId>apple-pay</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
   </parent>
   <groupId>com.appleframework.pay.app</groupId>
   <artifactId>apple-pay-app-settlement</artifactId>
