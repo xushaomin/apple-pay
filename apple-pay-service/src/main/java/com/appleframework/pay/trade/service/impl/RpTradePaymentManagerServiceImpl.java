@@ -944,7 +944,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		// 根据银行订单号获取支付信息
 		LOG.info("bankOrderNo=" + bankOrderNo);
 		
-		if(StringUtil.isEmpty(bankOrderNo)) {
+		if (StringUtil.isEmpty(bankOrderNo)) {
 			LOG.info("参数out_trade_no异常" + TradeBizException.TRADE_PARAM_ERROR);
 			throw new TradeBizException(TradeBizException.TRADE_PARAM_ERROR, "参数out_trade_no异常");
 		}
@@ -968,13 +968,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
 		if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(fundIntoType)) {// 商户收款
 			// 根据资金流向获取配置信息
-			rpUserPayInfo = rpUserPayInfoService.getByUserNo(merchantNo, PayWayEnum.WEIXIN.name());
+			rpUserPayInfo = rpUserPayInfoService.getByUserNo(merchantNo, payWayCode);
 			partnerKey = rpUserPayInfo.getPartnerKey();
 
 			LOG.info("rpUserPayInfo=" + rpUserPayInfo.toString());
 		} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
-			partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
-
 			RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByUserNo(merchantNo);
 			if (rpUserPayConfig == null) {
 				throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
@@ -986,12 +984,15 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
 			}
 		} else {
-			
+			LOG.error("错误的收款方式:" + fundIntoType);
 		}
 
 		if (PayWayEnum.WEIXIN.name().equals(payWayCode)) {
 			String sign = notifyMap.remove("sign");
 			LOG.info("sign=" + sign);
+			if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {
+				partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
+			}
 
 			if (WeiXinPayUtils.notifySign(notifyMap, sign, partnerKey)) {// 根据配置信息验证签名
 				if (WeixinTradeStateEnum.SUCCESS.name().equals(notifyMap.get("result_code"))) {// 业务结果成功
@@ -1012,30 +1013,28 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			} else {
 				throw new TradeBizException(TradeBizException.TRADE_WEIXIN_ERROR, "微信签名失败");
 			}
-
 		} else if (PayWayEnum.ALIPAY.name().equals(payWayCode)) {
-			String key = null;
+			String signType = notifyMap.get("sign_type");
+			String decryptKey = null;
 			if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(fundIntoType)) {// 商户收款
-				String signType = notifyMap.get("sign_type");
-		        if(signType.equals("MD5")) {
-		        	key = rpUserPayInfo.getAppSectet();
-		        }
-		        else if(signType.equals("RSA")) {
-		        	key = rpUserPayInfo.getRsaPublicKey();
-		        }
+				if (signType.equals("MD5")) {
+					decryptKey = rpUserPayInfo.getAppSectet();
+				} else if (signType.equals("RSA")) {
+					decryptKey = rpUserPayInfo.getRsaPublicKey();
+				}
 			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
-				String signType = notifyMap.get("sign_type");
-		        if(signType.equals("MD5")) {
-		        	key = AlipayConfigUtil.key;
-		        }
-		        else if(signType.equals("RSA")) {
-		        	key = AlipayConfigUtil.rsa_public_key;
-		        }
+				if (signType.equals("MD5")) {
+					decryptKey = AlipayConfigUtil.key;
+				} else if (signType.equals("RSA")) {
+					decryptKey = AlipayConfigUtil.rsa_public_key;
+				} else {
+					LOG.error("错误的加密方式:" + signType);
+				}
 			} else {
-				
+				LOG.error("错误的收款方式:" + fundIntoType);
 			}
 			
-			if (AlipayNotify.verify(partnerKey, key, notifyMap)) {// 验证成功
+			if (AlipayNotify.verify(partnerKey, decryptKey, notifyMap)) {// 验证成功
 				String tradeStatus = notifyMap.get("trade_status");
 				if (AliPayTradeStateEnum.TRADE_FINISHED.name().equals(tradeStatus)) {
 					// 判断该笔订单是否在商户网站中已经做过处理
@@ -1101,7 +1100,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			throw new TradeBizException(TradeBizException.TRADE_PAY_WAY_ERROR, "错误的支付方式");
 		}
 
-        LOG.info("返回支付通道{}信息{}",payWayCode,returnStr);
+		LOG.info("返回支付通道{}信息{}", payWayCode, returnStr);
         return returnStr;
     }
 
@@ -1136,47 +1135,94 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		LOG.info("merchantNo=" + merchantNo);
 		// 根据支付订单获取配置信息
 		String fundIntoType = rpTradePaymentRecord.getFundIntoType();// 获取资金流入类型
-                
+        
+		RpUserPayInfo rpUserPayInfo = null;
         String partnerKey = null;
-        String key = null;
-
+        
 		if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(fundIntoType)) {// 商户收款
 			// 根据资金流向获取配置信息
-			RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(merchantNo, PayWayEnum.WEIXIN.name());
+			rpUserPayInfo = rpUserPayInfoService.getByUserNo(merchantNo, payWayCode);
 			partnerKey = rpUserPayInfo.getPartnerKey();
-			key = rpUserPayInfo.getAppSectet();
 			LOG.info("rpUserPayInfo=" + rpUserPayInfo.toString());
 		} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
-			partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
-			String signType = resultMap.get("sign_type");
-	        if(signType.equals("MD5")) {
-	        	key = AlipayConfigUtil.key;
-	        }
-	        else if(signType.equals("RSA")) {
-	        	key = AlipayConfigUtil.rsa_public_key;
-	        }
-			
+			RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByUserNo(merchantNo);
+			if (rpUserPayConfig == null) {
+				throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
+			}
+			// 根据支付产品及支付方式获取费率
+			RpPayWay payWay = rpPayWayService.getByPayWayTypeCode(rpUserPayConfig.getProductCode(),
+					rpTradePaymentRecord.getPayWayCode(), rpTradePaymentRecord.getPayTypeCode());
+			if (payWay == null) {
+				throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
+			}
 		} else {
+			LOG.error("错误的收款方式:" + fundIntoType);
+		}
+		
+		if (PayWayEnum.ALIPAY.name().equals(payWayCode)) {
+			String signType = resultMap.get("sign_type");
+			String decryptKey = null;
+			if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(fundIntoType)) {// 商户收款
+				if (signType.equals("MD5")) {
+					decryptKey = rpUserPayInfo.getAppSectet();
+				} else if (signType.equals("RSA")) {
+					decryptKey = rpUserPayInfo.getRsaPublicKey();
+				} else {
+					LOG.error("错误的加密方式:" + signType);
+				}
+			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
+				if (signType.equals("MD5")) {
+					decryptKey = AlipayConfigUtil.key;
+				} else if (signType.equals("RSA")) {
+					decryptKey = AlipayConfigUtil.rsa_public_key;
+				} else {
+					LOG.error("错误的加密方式:" + signType);
+				}
+			} else {
+				LOG.error("错误的收款方式:" + fundIntoType);
+			}
 			
-		}		
-        
-        //计算得出通知验证结果
-		boolean verify_result = AlipayNotify.verify(partnerKey, key, resultMap);
-        if(verify_result){//验证成功
-        	String trade_status = resultMap.get("trade_status");
-            if(trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")){
-                String resultUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getReturnUrl(), TradeStatusEnum.SUCCESS);
-                orderPayResultVo.setReturnUrl(resultUrl);
-                orderPayResultVo.setStatus(TradeStatusEnum.SUCCESS.name());
-            }else{
-                String resultUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getReturnUrl(), TradeStatusEnum.FAILED);
-                orderPayResultVo.setReturnUrl(resultUrl);
-                orderPayResultVo.setStatus(TradeStatusEnum.FAILED.name());
-            }
-        }else{
-            throw new TradeBizException(TradeBizException.TRADE_ALIPAY_ERROR,"支付宝签名异常");
-        }
-        return orderPayResultVo;
+			//计算得出通知验证结果
+			boolean verify_result = AlipayNotify.verify(partnerKey, decryptKey, resultMap);
+			if (verify_result) {// 验证成功
+				String trade_status = resultMap.get("trade_status");
+				if (trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")) {
+					String resultUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getReturnUrl(), TradeStatusEnum.SUCCESS);
+					orderPayResultVo.setReturnUrl(resultUrl);
+					orderPayResultVo.setStatus(TradeStatusEnum.SUCCESS.name());
+				} else {
+					String resultUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getReturnUrl(), TradeStatusEnum.FAILED);
+					orderPayResultVo.setReturnUrl(resultUrl);
+					orderPayResultVo.setStatus(TradeStatusEnum.FAILED.name());
+				}
+			} else {
+				throw new TradeBizException(TradeBizException.TRADE_ALIPAY_ERROR, "支付宝签名异常");
+			}
+			return orderPayResultVo;
+		} else if (PayWayEnum.WEIXIN.name().equals(payWayCode)) {
+			String sign = resultMap.remove("sign");
+			LOG.info("sign=" + sign);
+			if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {
+				partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
+			}
+
+			if (WeiXinPayUtils.notifySign(resultMap, sign, partnerKey)) {// 根据配置信息验证签名
+				if (WeixinTradeStateEnum.SUCCESS.name().equals(resultMap.get("result_code"))) {// 业务结果成功
+					String resultUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getReturnUrl(), TradeStatusEnum.SUCCESS);
+					orderPayResultVo.setReturnUrl(resultUrl);
+					orderPayResultVo.setStatus(TradeStatusEnum.SUCCESS.name());
+				} else {
+					String resultUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getReturnUrl(), TradeStatusEnum.FAILED);
+					orderPayResultVo.setReturnUrl(resultUrl);
+					orderPayResultVo.setStatus(TradeStatusEnum.FAILED.name());
+				}
+			} else {
+				throw new TradeBizException(TradeBizException.TRADE_WEIXIN_ERROR, "微信签名失败");
+			}
+			return orderPayResultVo;
+		} else {
+			throw new TradeBizException(TradeBizException.TRADE_PAY_WAY_ERROR, "错误的支付方式");
+		}
     }
 
 

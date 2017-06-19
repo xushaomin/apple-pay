@@ -38,7 +38,7 @@ public class AlipayNotify {
      * @param params 通知返回来的参数数组
      * @return 验证结果
      */
-    public static boolean verify(String partner, String key, Map<String, String> params) {
+    public static boolean verify(String partner, String decryptKey, Map<String, String> params) {
 
         //判断responsetTxt是否为true，isSign是否为true
         //responsetTxt的结果不是true，与服务器设置问题、合作身份者ID、notify_id一分钟失效有关
@@ -52,7 +52,7 @@ public class AlipayNotify {
 		if (params.get("sign") != null) {
 			sign = params.get("sign");
 		}
-		boolean isSign = getSignVeryfy(key, params, sign);
+		boolean isSign = getSignVeryfy(decryptKey, params, sign);
 
         //写日志记录（若要调试，请取消下面两行注释）
         //String sWord = "responseTxt=" + responseTxt + "\n isSign=" + isSign + "\n 返回回来的参数：" + AlipayCore.createLinkString(params);
@@ -71,7 +71,7 @@ public class AlipayNotify {
      * @param sign 比对的签名结果
      * @return 生成的签名结果
      */
-	private static boolean getSignVeryfy(String key, Map<String, String> params, String sign) {
+	private static boolean getSignVeryfy(String decryptKey, Map<String, String> params, String sign) {
 		
         String signType = params.get("sign_type");
         String charset = params.get("charset");
@@ -87,11 +87,11 @@ public class AlipayNotify {
         boolean isSign = false;
         
         if(signType.equals("MD5")) {
-			isSign = MD5.verify(preSignStr, sign, key, charset);
+			isSign = MD5.verify(preSignStr, sign, decryptKey, charset);
         	//isSign = MD5.verify(preSignStr, sign, AlipayConfigUtil.key, charset);
         }
         else if(signType.equals("RSA")) {
-			isSign = RSA.verify(preSignStr, sign, key, charset);
+			isSign = RSA.verify(preSignStr, sign, decryptKey, charset);
         	//isSign = RSA.verify(preSignStr, sign, AlipayConfigUtil.rsa_public_key, charset);
         }
         else {
@@ -129,8 +129,7 @@ public class AlipayNotify {
         try {
             URL url = new URL(urlvalue);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection
-                .getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             inputLine = in.readLine().toString();
         } catch (Exception e) {
             LOG.error("alipay checkUrl exception:",e);

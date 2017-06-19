@@ -77,7 +77,6 @@ public class ScanPayNotifyController {
 
     @RequestMapping("/result/{payWayCode}")
     public String result(@PathVariable("payWayCode") String payWayCode, HttpServletRequest httpServletRequest , Model model) throws Exception {
-
         Map<String,String> resultMap = new HashMap<String,String>();
         Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
         for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
@@ -89,7 +88,7 @@ public class ScanPayNotifyController {
                         : valueStr + values[i] + ",";
             }
             //乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
-//            valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+            //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
             valueStr = new String(valueStr);
             resultMap.put(name, valueStr);
         }
