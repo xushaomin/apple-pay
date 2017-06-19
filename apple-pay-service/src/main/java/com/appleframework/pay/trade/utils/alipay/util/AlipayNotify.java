@@ -1,6 +1,5 @@
 package com.appleframework.pay.trade.utils.alipay.util;
 
-import com.appleframework.pay.trade.utils.alipay.config.AlipayConfigUtil;
 import com.appleframework.pay.trade.utils.alipay.sign.MD5;
 import com.appleframework.pay.trade.utils.alipay.sign.RSA;
 
@@ -39,7 +38,7 @@ public class AlipayNotify {
      * @param params 通知返回来的参数数组
      * @return 验证结果
      */
-    public static boolean verify(Map<String, String> params) {
+    public static boolean verify(String partner, String key, Map<String, String> params) {
 
         //判断responsetTxt是否为true，isSign是否为true
         //responsetTxt的结果不是true，与服务器设置问题、合作身份者ID、notify_id一分钟失效有关
@@ -47,13 +46,13 @@ public class AlipayNotify {
 		String responseTxt = "false";
 		if (params.get("notify_id") != null) {
 			String notify_id = params.get("notify_id");
-			responseTxt = verifyResponse(notify_id);
+			responseTxt = verifyResponse(partner, notify_id);
 		}
 		String sign = "";
 		if (params.get("sign") != null) {
 			sign = params.get("sign");
 		}
-		boolean isSign = getSignVeryfy(params, sign);
+		boolean isSign = getSignVeryfy(key, params, sign);
 
         //写日志记录（若要调试，请取消下面两行注释）
         //String sWord = "responseTxt=" + responseTxt + "\n isSign=" + isSign + "\n 返回回来的参数：" + AlipayCore.createLinkString(params);
@@ -72,7 +71,7 @@ public class AlipayNotify {
      * @param sign 比对的签名结果
      * @return 生成的签名结果
      */
-	private static boolean getSignVeryfy(Map<String, String> params, String sign) {
+	private static boolean getSignVeryfy(String key, Map<String, String> params, String sign) {
 		
         String signType = params.get("sign_type");
         String charset = params.get("charset");
@@ -88,10 +87,12 @@ public class AlipayNotify {
         boolean isSign = false;
         
         if(signType.equals("MD5")) {
-        	isSign = MD5.verify(preSignStr, sign, AlipayConfigUtil.key, charset);
+			isSign = MD5.verify(preSignStr, sign, key, charset);
+        	//isSign = MD5.verify(preSignStr, sign, AlipayConfigUtil.key, charset);
         }
         else if(signType.equals("RSA")) {
-        	isSign = RSA.verify(preSignStr, sign, AlipayConfigUtil.rsa_public_key, charset);
+			isSign = RSA.verify(preSignStr, sign, key, charset);
+        	//isSign = RSA.verify(preSignStr, sign, AlipayConfigUtil.rsa_public_key, charset);
         }
         else {
         	isSign = false;
@@ -108,9 +109,8 @@ public class AlipayNotify {
     * true 返回正确信息
     * false 请检查防火墙或者是服务器阻止端口问题以及验证时间是否超过一分钟
     */
-    private static String verifyResponse(String notify_id) {
+    private static String verifyResponse(String partner, String notify_id) {
         //获取远程服务器ATN结果，验证是否是支付宝服务器发来的请求
-        String partner = AlipayConfigUtil.partner;
         String veryfyUrl = HTTPS_VERIFY_URL + "partner=" + partner + "&notify_id=" + notify_id;
         return checkUrl(veryfyUrl);
     }

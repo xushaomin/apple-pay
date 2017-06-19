@@ -245,10 +245,10 @@ public class AliF2FPaySubmit {
     }
     
     
-    public static Map<String, String> orderQuery(String outTradeNo) {
+    public static Map<String, String> orderQuery(String partner, String outTradeNo) {
 		Map<String, String> sParaTemp = new HashMap<>();
 		sParaTemp.put("service", "single_trade_query");
-		sParaTemp.put("partner", AlipayConfigUtil.partner);
+		sParaTemp.put("partner", partner);
 		sParaTemp.put("_input_charset", AlipayConfigUtil.input_charset);
 		sParaTemp.put("out_trade_no", outTradeNo);
 		Map<String, String> sPara = buildRequestPara(sParaTemp);
@@ -358,9 +358,8 @@ public class AliF2FPaySubmit {
 		return resultMap;
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		System.out.println("查询结果：" + orderQuery("66662017042011056926").toString());
-	}
-
+	}*/
 
 }

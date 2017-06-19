@@ -15,7 +15,6 @@
  */
 package com.appleframework.pay.trade.utils;
 
-import com.appleframework.config.core.PropertyConfigurer;
 import com.appleframework.pay.common.core.utils.StringUtil;
 import com.appleframework.pay.trade.entity.weixinpay.WeiXinPrePay;
 import com.appleframework.pay.trade.enums.weixinpay.WeiXinTradeTypeEnum;
@@ -313,11 +312,9 @@ public class WeiXinPayUtils {
      */
     @SuppressWarnings("unchecked")
     public static Map<String, String> parseXml(InputStream inputStream) throws Exception {
-
         if (inputStream == null){
             return null;
         }
-
         Map<String, String> map = new HashMap<String, String>();// 将解析结果存储在HashMap中
         SAXReader reader = new SAXReader();// 读取输入流
         Document document = reader.read(inputStream);
@@ -339,10 +336,9 @@ public class WeiXinPayUtils {
 	 * @param outTradeNo
 	 * @return
 	 */
-	public static Map<String, Object> orderQuery(String outTradeNo) {
-        String appid = PropertyConfigurer.getString("weixinpay.appId");
-        String partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
-        
+	public static Map<String, Object> orderQuery(String appid, String partnerKey,String outTradeNo) {
+        //String appid = PropertyConfigurer.getString("weixinpay.appId");
+        //String partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
 		Random random = new Random();
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("appid", appid);
@@ -366,9 +362,9 @@ public class WeiXinPayUtils {
 		return resultMap;
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		Map<String, Object> resultMap = orderQuery("66662017042011056928");
 		System.out.println("回调结果：" + resultMap.toString());
-	}
+	}*/
 
 }
