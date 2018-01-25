@@ -17,6 +17,9 @@ package com.appleframework.pay.trade.utils.alipay.sign;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alipay.api.internal.util.AlipaySignature;
 import com.appleframework.pay.trade.utils.alipay.util.Base64;
 
@@ -34,6 +37,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public class RSA {
+	
+    private static final Logger logger = LoggerFactory.getLogger(RSA.class);
 
 	public static final String SIGN_ALGORITHMS = "SHA1WithRSA";
 
@@ -73,7 +78,7 @@ public class RSA {
 
 			return Base64.encode(signed);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		return null;
@@ -108,7 +113,7 @@ public class RSA {
 			return bverify;
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 			if(e instanceof NullPointerException) {
 				return true;
 			}
