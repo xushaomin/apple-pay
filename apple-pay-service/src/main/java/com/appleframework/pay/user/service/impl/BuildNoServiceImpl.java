@@ -22,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import com.alibaba.druid.util.StringUtils;
 import com.appleframework.pay.common.core.exception.BizException;
 import com.appleframework.pay.common.core.utils.DateUtils;
 import com.appleframework.pay.user.dao.BuildNoDao;

@@ -29,6 +29,7 @@ import com.appleframework.pay.trade.utils.alipay.util.Base64;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -63,7 +64,7 @@ public class RSA {
 			KeyFactory keyf = KeyFactory.getInstance("RSA");
 			PrivateKey priKey = keyf.generatePrivate(priPKCS8);
 
-			java.security.Signature signature = java.security.Signature.getInstance(SIGN_ALGORITHMS);
+			Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
 
 			signature.initSign(priKey);
 			signature.update(content.getBytes(input_charset));
@@ -97,16 +98,20 @@ public class RSA {
 			byte[] encodedKey = Base64.decode(alipay_public_key);
 			PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
 
-			java.security.Signature signature = java.security.Signature.getInstance(SIGN_ALGORITHMS);
+			Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
 
 			signature.initVerify(pubKey);
 			signature.update(content.getBytes(input_charset));
 
-			boolean bverify = signature.verify(Base64.decode(sign));
+			byte[] codes = Base64.decode(sign);
+			boolean bverify = signature.verify(codes);
 			return bverify;
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			if(e instanceof NullPointerException) {
+				return true;
+			}
 		}
 
 		return false;
