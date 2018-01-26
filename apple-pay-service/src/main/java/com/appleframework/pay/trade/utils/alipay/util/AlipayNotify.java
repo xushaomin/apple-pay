@@ -49,9 +49,9 @@ public class AlipayNotify {
 			responseTxt = verifyResponse(partner, notify_id);
 		}
 		//String sign = "";
-		if (params.get("sign") != null) {
+		/*if (params.get("sign") != null) {
 			sign = params.get("sign");
-		}
+		}*/
 		//boolean isSign = getSignVeryfy(decryptKey, params, sign);
 
         //写日志记录（若要调试，请取消下面两行注释）
