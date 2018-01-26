@@ -1034,8 +1034,10 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				LOG.error("错误的收款方式:" + fundIntoType);
 			}
 			
+			LOG.info("Pre AlipayNotify:" + notifyMap);
 			if (AlipayNotify.verify(partnerKey, decryptKey, notifyMap)) {// 验证成功
 				String tradeStatus = notifyMap.get("trade_status");
+				LOG.info("Pre AlipayNotify:tradeStatus=" + tradeStatus);
 				if (AliPayTradeStateEnum.TRADE_FINISHED.name().equals(tradeStatus)) {
 					// 判断该笔订单是否在商户网站中已经做过处理
 					// 如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
@@ -1050,6 +1052,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 					if (!StringUtil.isEmpty(gmtPaymentStr)) {
 						timeEnd = DateUtils.getDateFromString(gmtPaymentStr, "yyyy-MM-dd HH:mm:ss");
 					}
+					LOG.info("Pre completeSuccessOrder:" + notifyMap.get("trade_no"));
 					completeSuccessOrder(rpTradePaymentRecord, notifyMap.get("trade_no"), timeEnd, notifyMap.toString());
 					returnStr = "success";
 				} else {
