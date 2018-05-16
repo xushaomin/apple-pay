@@ -48,6 +48,9 @@ public class AlipayNotify {
 			String notify_id = params.get("notify_id");
 			responseTxt = verifyResponse(partner, notify_id);
 		}
+		if(responseTxt.equals("true")) {
+			return true;
+		}
 		String sign = "";
 		if (params.get("sign") != null) {
 			sign = params.get("sign");
@@ -55,10 +58,13 @@ public class AlipayNotify {
 		boolean isSign = getSignVeryfy(decryptKey, params, sign);
 
         //写日志记录（若要调试，请取消下面两行注释）
-        //String sWord = "responseTxt=" + responseTxt + "\n isSign=" + isSign + "\n 返回回来的参数：" + AlipayCore.createLinkString(params);
-	    //AlipayCore.logResult(sWord);
+        String sWord = "responseTxt=" + responseTxt + "\n isSign=" + isSign + "\n 返回回来的参数：" 
+        		+ AlipayCore.createLinkString(params);
+        if(LOG.isInfoEnabled()) {
+        	LOG.info(sWord);
+        }
 
-        if (isSign && responseTxt.equals("true")) {
+        if (isSign) {
             return true;
         } else {
             return false;
@@ -88,11 +94,9 @@ public class AlipayNotify {
         
         if(signType.equals("MD5")) {
 			isSign = MD5.verify(preSignStr, sign, decryptKey, charset);
-        	//isSign = MD5.verify(preSignStr, sign, AlipayConfigUtil.key, charset);
         }
         else if(signType.equals("RSA")) {
 			isSign = RSA.verify(preSignStr, sign, decryptKey, charset);
-        	//isSign = RSA.verify(preSignStr, sign, AlipayConfigUtil.rsa_public_key, charset);
         }
         else {
         	isSign = false;
