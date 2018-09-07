@@ -38,11 +38,11 @@ public class AlipaySubmit {
      * @param sPara 要签名的数组
      * @return 签名结果字符串
      */
-	public static String buildRequestMysign(Map<String, String> sPara) {
+	public static String buildRequestMysign(Map<String, String> sPara, String sectet) {
     	String prestr = AlipayCore.createLinkString(sPara); //把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
         String mysign = "";
         if(AlipayConfigUtil.sign_type.equals("MD5") ) {
-        	mysign = MD5.sign(prestr, AlipayConfigUtil.key, AlipayConfigUtil.input_charset);
+        	mysign = MD5.sign(prestr, sectet, AlipayConfigUtil.input_charset);
         }
         return mysign;
     }
@@ -52,11 +52,11 @@ public class AlipaySubmit {
      * @param sParaTemp 请求前的参数数组
      * @return 要请求的参数数组
      */
-    private static Map<String, String> buildRequestPara(Map<String, String> sParaTemp) {
+    private static Map<String, String> buildRequestPara(Map<String, String> sParaTemp, String sectet) {
         //除去数组中的空值和签名参数
         Map<String, String> sPara = AlipayCore.paraFilter(sParaTemp);
         //生成签名结果
-        String mysign = buildRequestMysign(sPara);
+        String mysign = buildRequestMysign(sPara, sectet);
 
         //签名结果与签名方式加入请求提交参数组中
         sPara.put("sign", mysign);
@@ -72,28 +72,26 @@ public class AlipaySubmit {
      * @param strButtonName 确认按钮显示文字
      * @return 提交表单HTML文本
      */
-    public static String buildRequest(Map<String, String> sParaTemp, String strMethod, String strButtonName) {
+    public static String buildRequest(Map<String, String> sParaTemp, String sectet, String strMethod, String strButtonName) {
         //待请求参数数组
-        Map<String, String> sPara = buildRequestPara(sParaTemp);
+        Map<String, String> sPara = buildRequestPara(sParaTemp, sectet);
         List<String> keys = new ArrayList<String>(sPara.keySet());
 
         StringBuffer sbHtml = new StringBuffer();
 
         sbHtml.append("<form id=\"alipaysubmit\" name=\"alipaysubmit\" action=\"" + ALIPAY_GATEWAY_NEW
-                      + "_input_charset=" + AlipayConfigUtil.input_charset + "\" method=\"" + strMethod
+                      + "_input_charset=" + AlipayConfigUtil.input_charset.toLowerCase() + "\" method=\"" + strMethod
                       + "\">");
 
         for (int i = 0; i < keys.size(); i++) {
-            String name = (String) keys.get(i);
-            String value = (String) sPara.get(name);
-
+            String name = keys.get(i);
+            String value = sPara.get(name);
             sbHtml.append("<input type=\"hidden\" name=\"" + name + "\" value=\"" + value + "\"/>");
         }
 
         //submit按钮控件请不要含有name属性
         sbHtml.append("<input type=\"submit\" value=\"" + strButtonName + "\" style=\"display:none;\"></form>");
         sbHtml.append("<script>document.forms['alipaysubmit'].submit();</script>");
-
         return sbHtml.toString();
     }
     

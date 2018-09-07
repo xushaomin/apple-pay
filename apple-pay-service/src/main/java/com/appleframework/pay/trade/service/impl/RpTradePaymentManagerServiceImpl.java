@@ -747,12 +747,25 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
                 throw new TradeBizException(TradeBizException.TRADE_WEIXIN_ERROR,"请求微信异常");
             }
         }else if (PayWayEnum.ALIPAY.name().equals(payWayCode)){//支付宝支付
-
+        	String partner = "";
+        	String sellerId = "";
+        	String sectet = "";
+        	if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//商户收款
+                //根据资金流向获取配置信息
+                RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(),payWayCode);
+                partner = rpUserPayInfo.getPartnerKey();
+                sellerId = rpUserPayInfo.getMerchantId();
+                sectet = rpUserPayInfo.getAppSectet();
+            }else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//平台收款
+            	partner = AlipayConfigUtil.partner;
+            	sellerId = AlipayConfigUtil.seller_id;
+            	sectet = AlipayConfigUtil.key;
+            }
             //把请求参数打包成数组
             Map<String, String> sParaTemp = new HashMap<String, String>();
             sParaTemp.put("service", AlipayConfigUtil.service);
-            sParaTemp.put("partner", AlipayConfigUtil.partner);
-            sParaTemp.put("seller_id", AlipayConfigUtil.seller_id);
+            sParaTemp.put("partner", partner);
+            sParaTemp.put("seller_id", sellerId);
             sParaTemp.put("_input_charset", AlipayConfigUtil.input_charset);
             sParaTemp.put("payment_type", AlipayConfigUtil.payment_type);
             sParaTemp.put("notify_url", AlipayConfigUtil.notify_url);
@@ -764,11 +777,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             sParaTemp.put("total_fee", String.valueOf(rpTradePaymentOrder.getOrderAmount().setScale(2,BigDecimal.ROUND_HALF_UP)));//小数点后两位
             sParaTemp.put("body", "");
             //获取请求页面数据
-            String sHtmlText = AlipaySubmit.buildRequest(sParaTemp, "get", "确认");
+            String sHtmlText = AlipaySubmit.buildRequest(sParaTemp, sectet, "post", "确认");
 
             rpTradePaymentRecord.setBankReturnMsg(sHtmlText);
             rpTradePaymentRecordDao.update(rpTradePaymentRecord);
-            scanPayResultVo.setCodeUrl(sHtmlText);//设置微信跳转地址
+            scanPayResultVo.setCodeUrl(sHtmlText);//设置跳转地址
             scanPayResultVo.setPayWayCode(PayWayEnum.ALIPAY.name());
             scanPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
             scanPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
