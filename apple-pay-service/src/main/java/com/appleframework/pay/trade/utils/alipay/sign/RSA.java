@@ -15,6 +15,9 @@
  */
 package com.appleframework.pay.trade.utils.alipay.sign;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.alipay.api.internal.util.AlipaySignature;
 import com.appleframework.pay.trade.utils.alipay.util.Base64;
+import com.appleframework.pay.trade.utils.alipay.util.StringUtils;
 
 /**
  * 功能：支付宝MD5签名处理核心文件，不需要修改 版本：3.3 修改日期：2012-08-17 说明：
@@ -40,12 +44,15 @@ public class RSA {
 	
     private static final Logger logger = LoggerFactory.getLogger(RSA.class);
 
-	public static final String SIGN_ALGORITHMS = "SHA1WithRSA";
+	public static final String SIGN_ALGORITHMS_1 = "SHA1WithRSA";
+	
+	public static final String SIGN_ALGORITHMS_2 = "SHA256WithRSA";
 
 	public static String sign(Map<String, String> sParaTemp, String privateKey, String input_charset) {
 		String sign = null;
 		try {
-			sign = AlipaySignature.rsaSign(sParaTemp, privateKey, input_charset);
+			String signContent = getSignContent(sParaTemp);
+			sign = AlipaySignature.rsa256Sign(signContent, privateKey, input_charset);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -69,7 +76,7 @@ public class RSA {
 			KeyFactory keyf = KeyFactory.getInstance("RSA");
 			PrivateKey priKey = keyf.generatePrivate(priPKCS8);
 
-			Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
+			Signature signature = Signature.getInstance(SIGN_ALGORITHMS_2);
 
 			signature.initSign(priKey);
 			signature.update(content.getBytes(input_charset));
@@ -103,7 +110,7 @@ public class RSA {
 			byte[] encodedKey = Base64.decode(alipay_public_key);
 			PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
 
-			Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
+			Signature signature = Signature.getInstance(SIGN_ALGORITHMS_2);
 
 			signature.initVerify(pubKey);
 			signature.update(content.getBytes(input_charset));
@@ -120,5 +127,21 @@ public class RSA {
 		}
 
 		return false;
+	}
+	
+	public static String getSignContent(Map<String, String> sortedParams) {
+		StringBuffer content = new StringBuffer();
+		List<String> keys = new ArrayList<String>(sortedParams.keySet());
+		Collections.sort(keys);
+		int index = 0;
+		for (int i = 0; i < keys.size(); i++) {
+			String key = (String) keys.get(i);
+			String value = (String) sortedParams.get(key);
+			if (StringUtils.areNotEmpty(new String[] { key, value })) {
+				content.append((index == 0 ? "" : "&") + key + "=" + value);
+				index++;
+			}
+		}
+		return content.toString();
 	}
 }

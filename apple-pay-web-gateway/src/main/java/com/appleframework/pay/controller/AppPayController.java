@@ -28,6 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.appleframework.pay.common.core.utils.DateUtils;
 import com.appleframework.pay.controller.common.BaseController;
 import com.appleframework.pay.trade.exception.TradeBizException;
@@ -37,7 +38,6 @@ import com.appleframework.pay.trade.vo.AppPayResultVo;
 import com.appleframework.pay.user.entity.RpUserPayConfig;
 import com.appleframework.pay.user.exception.UserBizException;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
-import com.taobao.diamond.utils.JSONUtils;
 
 /**
  * <b>功能说明:扫码支付控制类
@@ -111,13 +111,8 @@ public class AppPayController extends BaseController {
 		Date orderTime = DateUtils.parseDate(orderTimeStr, "yyyyMMddHHmmss");
 		Integer orderPeriod = Integer.valueOf(orderPeriodStr);
         
-        if(LOG.isInfoEnabled()) {
-        	try {
-				LOG.info("PAY请求参数:" + JSONUtils.serializeObject(paramMap));
-			} catch (Exception e) {
-			}
-        }
-
+		LOG.info("PAY请求参数:" + JSON.toJSONString(paramMap));
+        
 		RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
 		if (rpUserPayConfig == null) {
 			throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
@@ -133,6 +128,7 @@ public class AppPayController extends BaseController {
         			payWayCode, orderIp, orderPeriod, returnUrl, notifyUrl, remark, 
         			field1, field2, field3, field4, field5);
 
+		LOG.info("PAY返回:" + JSON.toJSONString(appPayResultVo));
         return appPayResultVo;
     }
 

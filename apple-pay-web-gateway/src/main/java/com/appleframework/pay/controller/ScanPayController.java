@@ -24,12 +24,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.alibaba.fastjson.JSON;
 import com.appleframework.config.core.PropertyConfigurer;
 import com.appleframework.pay.common.core.enums.PayWayEnum;
 import com.appleframework.pay.common.core.utils.DateUtils;
@@ -58,6 +61,7 @@ import com.appleframework.pay.utils.JsonUtils;
 @RequestMapping(value = "/scanPay")
 public class ScanPayController extends BaseController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ScanPayController.class) ;
 
     @Autowired
     private RpTradePaymentManagerService rpTradePaymentManagerService;
@@ -127,42 +131,46 @@ public class ScanPayController extends BaseController {
 
         RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
         if (rpUserPayConfig == null){
+        	logger.error("用户支付配置有误:" + payKey);
             throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
+        }
+        else {
+        	if(logger.isInfoEnabled()) {
+        		logger.info("用户支付配置:" + JSON.toJSONString(rpUserPayConfig));
+        	}
         }
 
         cnpPayService.checkIp( rpUserPayConfig ,  httpServletRequest);//ip校验
 
-        if (!MerchantApiUtil.isRightSign(paramMap,rpUserPayConfig.getPaySecret(),sign)){
-            throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
-        }
+		if (!MerchantApiUtil.isRightSign(paramMap, rpUserPayConfig.getPaySecret(), sign)) {
+			logger.error("订单签名异常:" + paramMap.toString());
+			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "订单签名异常");
+		}
 
-        if (StringUtil.isEmpty(payWayCode)){//非直连方式
+		if (StringUtil.isEmpty(payWayCode)) {// 非直连方式
             BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
-            RpPayGateWayPageShowVo payGateWayPageShowVo = rpTradePaymentManagerService.initNonDirectScanPay(payKey, productName, orderNo, orderDate, orderTime, orderPrice, orderIp, orderPeriod, returnUrl
-                    , notifyUrl, remark, field1, field2, field3, field4, field5);
-
+            RpPayGateWayPageShowVo payGateWayPageShowVo = rpTradePaymentManagerService
+            		.initNonDirectScanPay(payKey, productName, orderNo, orderDate, orderTime, orderPrice, 
+            		orderIp, orderPeriod, returnUrl, notifyUrl, remark, field1, field2, field3, field4, field5);
             model.addAttribute("payGateWayPageShowVo",payGateWayPageShowVo);//支付网关展示数据
             return "gateway";
-
-        }else{//直连方式
-
+		} else { // 直连方式
             BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
-            ScanPayResultVo scanPayResultVo = rpTradePaymentManagerService.initDirectScanPay(payKey, productName, orderNo, orderDate, orderTime, orderPrice, payWayCode, orderIp, orderPeriod, returnUrl
-                    , notifyUrl, remark, field1, field2, field3, field4, field5);
-
+            ScanPayResultVo scanPayResultVo = rpTradePaymentManagerService.initDirectScanPay(payKey, productName, 
+            		orderNo, orderDate, orderTime, orderPrice, payWayCode, orderIp, orderPeriod, returnUrl, 
+            		notifyUrl, remark, field1, field2, field3, field4, field5);
             model.addAttribute("codeUrl",scanPayResultVo.getCodeUrl());//支付二维码
-
-            if (PayWayEnum.WEIXIN.name().equals(scanPayResultVo.getPayWayCode())){
-                model.addAttribute("queryUrl", PropertyConfigurer.getString("weixinpay.order_query_url") + "?orderNO=" + orderNo + "&payKey=" + payKey);
-                model.addAttribute("productName",productName);//产品名称
-                model.addAttribute("orderPrice",orderPrice);//订单价格
-                return "weixinPayScanPay";
-            }else if (PayWayEnum.ALIPAY.name().equals(scanPayResultVo.getPayWayCode())){
-                return "alipayDirectPay";
-            }
-
+			if (PayWayEnum.WEIXIN.name().equals(scanPayResultVo.getPayWayCode())) {
+				String orderQueryUrl =  PropertyConfigurer.getString("weixinpay.order_query_url") 
+						+ "?orderNO=" + orderNo + "&payKey=" + payKey;
+				model.addAttribute("queryUrl", orderQueryUrl);
+				model.addAttribute("productName", productName);// 产品名称
+				model.addAttribute("orderPrice", orderPrice);// 订单价格
+				return "weixinPayScanPay";
+			} else if (PayWayEnum.ALIPAY.name().equals(scanPayResultVo.getPayWayCode())) {
+				return "alipayDirectPay";
+			}
         }
-
         return "gateway";
     }
 

@@ -231,8 +231,10 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
         RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
         if (rpUserPayConfig == null){
+        	LOG.error("用户支付配置有误:" + payKey);
             throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
         }
+        LOG.info("用户支付配置:" + JSON.toJSONString(rpUserPayConfig));
 
         //根据支付产品及支付方式获取费率
         RpPayWay payWay = null;
@@ -248,16 +250,24 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			payType = PayTypeEnum.IN_APP;
 		}
 
-        if(payWay == null){
-            throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
-        }
+		if (payWay == null) {
+			LOG.error("用户支付配置有误:" + payKey);
+			throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
+		}
 
-        String merchantNo = rpUserPayConfig.getUserNo();//商户编号
+		LOG.info("用户支付方式配置:" + JSON.toJSONString(payWay));
 
-        RpUserInfo rpUserInfo = rpUserInfoService.getDataByMerchentNo(merchantNo);
-        if (rpUserInfo == null){
-            throw new UserBizException(UserBizException.USER_IS_NULL,"用户不存在");
-        }
+		String merchantNo = rpUserPayConfig.getUserNo();// 商户编号
+
+		LOG.info("商户编号:" + merchantNo);
+
+		RpUserInfo rpUserInfo = rpUserInfoService.getDataByMerchentNo(merchantNo);
+		if (rpUserInfo == null) {
+			LOG.error("商户不存在:" + merchantNo);
+			throw new UserBizException(UserBizException.USER_IS_NULL, "商户不存在");
+		}
+		
+		LOG.info("商户信息:" + JSON.toJSONString(rpUserInfo));
 
         RpTradePaymentOrder rpTradePaymentOrder = rpTradePaymentOrderDao.selectByMerchantNoAndMerchantOrderNo(merchantNo, orderNo);
         if (rpTradePaymentOrder == null){
@@ -698,6 +708,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         RpTradePaymentRecord rpTradePaymentRecord = sealRpTradePaymentRecord( rpTradePaymentOrder.getMerchantNo(),  rpTradePaymentOrder.getMerchantName() , rpTradePaymentOrder.getProductName(),  rpTradePaymentOrder.getMerchantOrderNo(),  rpTradePaymentOrder.getOrderAmount(), payWay.getPayWayCode(),  payWay.getPayWayName() , payType, rpTradePaymentOrder.getFundIntoType()  , BigDecimal.valueOf(payWay.getPayRate()) ,  rpTradePaymentOrder.getOrderIp(),  rpTradePaymentOrder.getReturnUrl(),  rpTradePaymentOrder.getNotifyUrl(),  rpTradePaymentOrder.getRemark(),  rpTradePaymentOrder.getField1(),  rpTradePaymentOrder.getField2(),  rpTradePaymentOrder.getField3(),  rpTradePaymentOrder.getField4(),  rpTradePaymentOrder.getField5());
         rpTradePaymentRecordDao.insert(rpTradePaymentRecord);
 
+		LOG.info("支付方式={}", payWayCode);
+		LOG.info("支付类型={}", payType.getDesc());
+        
         if (PayWayEnum.WEIXIN.name().equals(payWayCode)){//微信支付
             String appid = "";
             String mch_id = "";
@@ -761,6 +774,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             	sellerId = AlipayConfigUtil.seller_id;
             	sectet = AlipayConfigUtil.key;
             }
+        	LOG.info("支付宝partner={}", partner);
+        	LOG.info("支付宝sellerId={}", sellerId);
+        	LOG.info("支付宝sectet={}", sectet);
             //把请求参数打包成数组
             Map<String, String> sParaTemp = new HashMap<String, String>();
             sParaTemp.put("service", AlipayConfigUtil.service);
@@ -778,7 +794,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             sParaTemp.put("body", "");
             //获取请求页面数据
             String sHtmlText = AlipaySubmit.buildRequest(sParaTemp, sectet, "post", "确认");
-
+            LOG.info("支付宝sHtmlText={}", sHtmlText);
             rpTradePaymentRecord.setBankReturnMsg(sHtmlText);
             rpTradePaymentRecordDao.update(rpTradePaymentRecord);
             scanPayResultVo.setCodeUrl(sHtmlText);//设置跳转地址
@@ -804,6 +820,8 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
     	AppPayResultVo appPayResultVo = new AppPayResultVo();
 
         String payWayCode = payWay.getPayWayCode();//支付方式
+        
+        LOG.info("支付方式:" + payWayCode);
 
         PayTypeEnum payType = null;
 		if (PayWayEnum.WEIXIN.name().equals(payWay.getPayWayCode())) {
@@ -907,7 +925,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             Map<String, String> sParaTemp = new HashMap<String, String>();
             sParaTemp.put("app_id", app_id);
             sParaTemp.put("biz_content", bizConentJson);
-            sParaTemp.put("sign_type", "RSA");
+            sParaTemp.put("sign_type", "RSA2");
             sParaTemp.put("charset", AlipayConfigUtil.input_charset);
             //sParaTemp.put("format", "JSON");            
             sParaTemp.put("timestamp", DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT_DATETIME));

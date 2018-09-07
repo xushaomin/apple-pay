@@ -32,6 +32,10 @@ public enum PayTypeEnum {
     H5PAY("WEIXIN","H5支付"),
     
     APPPAY("WEIXIN","APP支付"),
+    
+    MICRO_PAY("WEIXIN","刷卡支付"),
+     
+    WX_PROGRAM_PAY("WEIXIN","微信小程序"),
 
     DIRECT_PAY("ALIPAY","即时到账"),
 
