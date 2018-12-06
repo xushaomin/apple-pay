@@ -135,8 +135,8 @@ public class RSA {
 		Collections.sort(keys);
 		int index = 0;
 		for (int i = 0; i < keys.size(); i++) {
-			String key = (String) keys.get(i);
-			String value = (String) sortedParams.get(key);
+			String key = keys.get(i);
+			String value = sortedParams.get(key);
 			if (StringUtils.areNotEmpty(new String[] { key, value })) {
 				content.append((index == 0 ? "" : "&") + key + "=" + value);
 				index++;

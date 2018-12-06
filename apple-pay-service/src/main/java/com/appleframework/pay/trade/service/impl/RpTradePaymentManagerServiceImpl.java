@@ -890,19 +890,22 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         } else if (PayWayEnum.ALIPAY.name().equals(payWayCode)){//支付宝支付
         	
         	String app_id = "";
-            String seller_id = "";
+            //String seller_id = "";
             String rsa_private_key = "";
+            //String alipay_public_key = "";
             
             if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//商户收款
                 //根据资金流向获取配置信息
                 RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(), payWayCode);
                 app_id = rpUserPayInfo.getAppId();
-                seller_id = rpUserPayInfo.getMerchantId();
+                //seller_id = rpUserPayInfo.getMerchantId();
                 rsa_private_key = rpUserPayInfo.getRsaPrivateKey();
+                //alipay_public_key = rpUserPayInfo.getRsaPublicKey();
             }else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//平台收款
             	app_id = AlipayConfigUtil.app_id;
-            	seller_id = AlipayConfigUtil.seller_id;
+            	//seller_id = AlipayConfigUtil.seller_id;
             	rsa_private_key = AlipayConfigUtil.rsa_private_key;
+            	//alipay_public_key = AlipayConfigUtil.rsa_public_key;
             }
 
         	//app_id=2015052600090779&biz_content={"timeout_express":"30m","seller_id":"",
@@ -912,28 +915,30 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
         	Map<String, String> bizContentMap = new HashMap<String, String>();
         	bizContentMap.put("timeout_express", "30m");
-        	bizContentMap.put("seller_id", seller_id);
+        	//bizContentMap.put("seller_id", seller_id);
         	bizContentMap.put("product_code", "QUICK_MSECURITY_PAY");
         	bizContentMap.put("total_amount", String.valueOf(rpTradePaymentOrder.getOrderAmount().setScale(2,BigDecimal.ROUND_HALF_UP)));//小数点后两位
         	bizContentMap.put("subject", rpTradePaymentOrder.getProductName());
-        	bizContentMap.put("body", "");
+        	//bizContentMap.put("body", "");
         	bizContentMap.put("out_trade_no", rpTradePaymentRecord.getBankOrderNo());
         	
         	String bizConentJson = JSON.toJSONString(bizContentMap);
+        	
+        	String charset = AlipayConfigUtil.input_charset;
 
             //把请求参数打包成数组
             Map<String, String> sParaTemp = new HashMap<String, String>();
             sParaTemp.put("app_id", app_id);
             sParaTemp.put("biz_content", bizConentJson);
             sParaTemp.put("sign_type", "RSA2");
-            sParaTemp.put("charset", AlipayConfigUtil.input_charset);
-            //sParaTemp.put("format", "JSON");            
+            sParaTemp.put("charset", charset);
+            //sParaTemp.put("format", "json");            
             sParaTemp.put("timestamp", DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT_DATETIME));
             sParaTemp.put("method", "alipay.trade.app.pay");
             sParaTemp.put("notify_url", AlipayConfigUtil.notify_url);
             sParaTemp.put("version", "1.0");
 
-            String sign = RSA.sign(sParaTemp, rsa_private_key, AlipayConfigUtil.input_charset);
+            String sign = RSA.sign(sParaTemp, rsa_private_key, charset);
             sParaTemp.put("sign", sign);
             
             rpTradePaymentRecord.setBankReturnMsg(bizConentJson);
