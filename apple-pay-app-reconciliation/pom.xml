@@ -24,7 +24,6 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.appleframework.pay.service</groupId>
 			<artifactId>apple-pay-service</artifactId>
@@ -52,6 +51,11 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>dom4j</groupId>
+  			<artifactId>dom4j</artifactId>
 		</dependency>
 
 	</dependencies>

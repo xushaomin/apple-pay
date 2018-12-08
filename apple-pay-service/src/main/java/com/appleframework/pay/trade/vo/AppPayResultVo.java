@@ -17,7 +17,6 @@ package com.appleframework.pay.trade.vo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Map;
 
 /**
  * <b>功能说明:扫码支付结果展示实体
@@ -32,7 +31,7 @@ public class AppPayResultVo implements Serializable {
 	/**
      * 预付相关信息
      */
-	private Map<String, String> prePay;
+	private Object prePay;
 	
 	/**
      * 支付方式编码
@@ -69,11 +68,11 @@ public class AppPayResultVo implements Serializable {
         this.productName = productName;
     }
 
-	public Map<String, String> getPrePay() {
+	public Object getPrePay() {
 		return prePay;
 	}
 
-	public void setPrePay(Map<String, String> prePay) {
+	public void setPrePay(Object prePay) {
 		this.prePay = prePay;
 	}
     

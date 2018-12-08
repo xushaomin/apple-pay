@@ -28,6 +28,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.appleframework.config.core.PropertyConfigurer;
 import com.appleframework.pay.account.service.RpAccountTransactionService;
 import com.appleframework.pay.common.core.enums.PayTypeEnum;
@@ -53,7 +60,6 @@ import com.appleframework.pay.trade.utils.MerchantApiUtil;
 import com.appleframework.pay.trade.utils.WeiXinPayUtils;
 import com.appleframework.pay.trade.utils.alipay.config.AlipayConfigUtil;
 import com.appleframework.pay.trade.utils.alipay.f2fpay.AliF2FPaySubmit;
-import com.appleframework.pay.trade.utils.alipay.sign.RSA;
 import com.appleframework.pay.trade.utils.alipay.util.AlipayNotify;
 import com.appleframework.pay.trade.utils.alipay.util.AlipaySubmit;
 import com.appleframework.pay.trade.utils.alipay.util.ApplePayNotify;
@@ -887,72 +893,70 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             } else {
                 throw new TradeBizException(TradeBizException.TRADE_WEIXIN_ERROR,"请求微信异常");
             }
-        } else if (PayWayEnum.ALIPAY.name().equals(payWayCode)){//支付宝支付
-        	
-        	String app_id = "";
-            //String seller_id = "";
-            String rsa_private_key = "";
-            //String alipay_public_key = "";
-            
-            if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//商户收款
-                //根据资金流向获取配置信息
-                RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(), payWayCode);
-                app_id = rpUserPayInfo.getAppId();
-                //seller_id = rpUserPayInfo.getMerchantId();
-                rsa_private_key = rpUserPayInfo.getRsaPrivateKey();
-                //alipay_public_key = rpUserPayInfo.getRsaPublicKey();
-            }else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//平台收款
-            	app_id = AlipayConfigUtil.app_id;
-            	//seller_id = AlipayConfigUtil.seller_id;
-            	rsa_private_key = AlipayConfigUtil.rsa_private_key;
-            	//alipay_public_key = AlipayConfigUtil.rsa_public_key;
-            }
+		} else if (PayWayEnum.ALIPAY.name().equals(payWayCode)) {
+			// 支付宝支付
+			String app_id = "";
+			String seller_id = "";
+			String rsa_private_key = "";
+			String alipay_public_key = "";
 
-        	//app_id=2015052600090779&biz_content={"timeout_express":"30m","seller_id":"",
-        	//"product_code":"QUICK_MSECURITY_PAY","total_amount":"0.01","subject":"1","body":"我是测试数据",
-        	//"out_trade_no":"IQJZSRC1YMQB5HU"}&charset=utf-8&format=json&method=alipay.trade.app.pay
-        	//&notify_url=http://domain.merchant.com/payment_notify&sign_type=RSA&timestamp=2016-08-25 20:26:31&version=1.0
+			if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())) {// 商户收款
+				// 根据资金流向获取配置信息
+				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(),
+						payWayCode);
+				app_id = rpUserPayInfo.getAppId();
+				seller_id = rpUserPayInfo.getMerchantId();
+				rsa_private_key = rpUserPayInfo.getRsaPrivateKey();
+				alipay_public_key = rpUserPayInfo.getRsaPublicKey();
+			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())) {// 平台收款
+				app_id = AlipayConfigUtil.app_id;
+				seller_id = AlipayConfigUtil.seller_id;
+				rsa_private_key = AlipayConfigUtil.rsa_private_key;
+				alipay_public_key = AlipayConfigUtil.rsa_public_key;
+			}
 
-        	Map<String, String> bizContentMap = new HashMap<String, String>();
-        	bizContentMap.put("timeout_express", "30m");
-        	//bizContentMap.put("seller_id", seller_id);
-        	bizContentMap.put("product_code", "QUICK_MSECURITY_PAY");
-        	bizContentMap.put("total_amount", String.valueOf(rpTradePaymentOrder.getOrderAmount().setScale(2,BigDecimal.ROUND_HALF_UP)));//小数点后两位
-        	bizContentMap.put("subject", rpTradePaymentOrder.getProductName());
-        	//bizContentMap.put("body", "");
-        	bizContentMap.put("out_trade_no", rpTradePaymentRecord.getBankOrderNo());
-        	
-        	String bizConentJson = JSON.toJSONString(bizContentMap);
-        	
-        	String charset = AlipayConfigUtil.input_charset;
+			String charset = AlipayConfigUtil.input_charset;
+			String serverUrl = "https://openapi.alipay.com/gateway.do";
+			BigDecimal total_amount = rpTradePaymentOrder.getOrderAmount().setScale(2, BigDecimal.ROUND_HALF_UP);
 
-            //把请求参数打包成数组
-            Map<String, String> sParaTemp = new HashMap<String, String>();
-            sParaTemp.put("app_id", app_id);
-            sParaTemp.put("biz_content", bizConentJson);
-            sParaTemp.put("sign_type", "RSA2");
-            sParaTemp.put("charset", charset);
-            //sParaTemp.put("format", "json");            
-            sParaTemp.put("timestamp", DateUtils.formatDate(new Date(), DateUtils.DATE_FORMAT_DATETIME));
-            sParaTemp.put("method", "alipay.trade.app.pay");
-            sParaTemp.put("notify_url", AlipayConfigUtil.notify_url);
-            sParaTemp.put("version", "1.0");
+			AlipayClient alipayClient = new 
+					DefaultAlipayClient(serverUrl, app_id, rsa_private_key, "json", charset, alipay_public_key, "RSA2");
+			AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+			AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+			// model.setBody("我是测试数据");
+			model.setSellerId(seller_id);
+			model.setSubject(rpTradePaymentOrder.getProductName());
+			model.setOutTradeNo(rpTradePaymentRecord.getBankOrderNo());
+			model.setTimeoutExpress("30m");
+			model.setTotalAmount(String.valueOf(total_amount));
+			model.setProductCode("QUICK_MSECURITY_PAY");
+			request.setBizModel(model);
+			request.setNotifyUrl(AlipayConfigUtil.notify_url);
 
-            String sign = RSA.sign(sParaTemp, rsa_private_key, charset);
-            sParaTemp.put("sign", sign);
-            
-            rpTradePaymentRecord.setBankReturnMsg(bizConentJson);
-            rpTradePaymentRecordDao.update(rpTradePaymentRecord);
-            //appPayResultVo.setCodeUrl(sHtmlText);//设置微信跳转地址
-            appPayResultVo.setPayWayCode(PayWayEnum.ALIPAY.name());
-            appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
-            appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
-            appPayResultVo.setPrePay(sParaTemp);
+			String prePayMessage = null;
+			try {
+				AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
+				if(response.isSuccess()){ 
+					prePayMessage = response.getBody();
+				} else {
+					LOG.error("AlipayTradeAppPayResponse Error!");
+				}
+				LOG.info(prePayMessage);
+			} catch (AlipayApiException e) {
+				LOG.info(e.getMessage());
+			}
 
-        } else if (PayWayEnum.APPLE.name().equals(payWayCode)){//苹果支付
+			rpTradePaymentRecord.setBankReturnMsg(prePayMessage);
+			rpTradePaymentRecordDao.update(rpTradePaymentRecord);
+			// appPayResultVo.setCodeUrl(sHtmlText);//设置微信跳转地址
+			appPayResultVo.setPayWayCode(PayWayEnum.ALIPAY.name());
+			appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
+			appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
+			appPayResultVo.setPrePay(prePayMessage);
+
+		} else if (PayWayEnum.APPLE.name().equals(payWayCode)){//苹果支付
             Map<String, String> sParaTemp = new HashMap<String, String>();
             sParaTemp.put("out_trade_no", rpTradePaymentRecord.getBankOrderNo());
-            
             appPayResultVo.setPayWayCode(PayWayEnum.APPLE.name());
             appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
             appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
@@ -1053,15 +1057,17 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			String signType = notifyMap.get("sign_type");
 			String decryptKey = null;
 			if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(fundIntoType)) {// 商户收款
-				if (signType.equals("MD5")) {
+				if (signType.equalsIgnoreCase("MD5")) {
 					decryptKey = rpUserPayInfo.getAppSectet();
-				} else if (signType.equals("RSA")) {
+				} else if (signType.equalsIgnoreCase("RSA") || signType.equalsIgnoreCase("RSA2")) {
 					decryptKey = rpUserPayInfo.getRsaPublicKey();
+				} else {
+					LOG.error("错误的加密方式:" + signType);
 				}
 			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
-				if (signType.equals("MD5")) {
+				if (signType.equalsIgnoreCase("MD5")) {
 					decryptKey = AlipayConfigUtil.key;
-				} else if (signType.equals("RSA")) {
+				} else if (signType.equalsIgnoreCase("RSA") || signType.equalsIgnoreCase("RSA2")) {
 					decryptKey = AlipayConfigUtil.rsa_public_key;
 				} else {
 					LOG.error("错误的加密方式:" + signType);
@@ -1071,7 +1077,16 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			}
 			
 			LOG.info("Pre AlipayNotify:" + notifyMap);
-			if (AlipayNotify.verify(partnerKey, decryptKey, notifyMap)) {// 验证成功
+			
+			String charset = AlipayConfigUtil.input_charset;
+			boolean verifyResult = false;
+			try {
+				verifyResult = AlipaySignature.rsaCheckV1(notifyMap, decryptKey, charset);
+			} catch (AlipayApiException e) {
+				LOG.error(e.getErrCode() + ":" + e.getErrMsg());
+			}
+			
+			if (verifyResult) {// 验证成功
 				String tradeStatus = notifyMap.get("trade_status");
 				LOG.info("AFT AlipayNotify:tradeStatus=" + tradeStatus);
 				if (AliPayTradeStateEnum.TRADE_FINISHED.name().equals(tradeStatus)) {

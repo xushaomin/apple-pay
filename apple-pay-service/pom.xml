@@ -65,9 +65,9 @@
 		
 		<dependency>
 			<groupId>com.appleframework.pay</groupId>
-			<artifactId>alipay-sdk-java</artifactId>
+			<artifactId>alipay-trade-sdk</artifactId>
 		</dependency>
-		
+						
 	</dependencies>
 
 	<!-- 打包插件 -->

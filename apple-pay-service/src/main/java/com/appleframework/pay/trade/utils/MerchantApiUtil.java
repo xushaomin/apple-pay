@@ -20,6 +20,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <b>功能说明:商户API工具类
@@ -29,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class MerchantApiUtil {
 
+    private static final Logger logger = LoggerFactory.getLogger(MerchantApiUtil.class);
 
     /**
      * 获取参数签名
@@ -88,7 +91,8 @@ public class MerchantApiUtil {
         String sign = getSign(paramMap, paySecret);
         if(signStr.equals(sign)){
             return true;
-        }else{
+		} else {
+			logger.warn("the right sign: " + sign);
             return false;
         }
     }

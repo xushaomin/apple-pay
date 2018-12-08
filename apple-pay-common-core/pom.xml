@@ -207,21 +207,7 @@
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom</artifactId>
 		</dependency>
-
-		<!-- 
-		<dependency>
-			<groupId>com.appleframework.pay</groupId>
-			<artifactId>alipay-sdk-java</artifactId>
-		</dependency>
-		 -->
-
-		<dependency>
-			<groupId>com.appleframework.pay</groupId>
-			<artifactId>alipay-trade-sdk</artifactId>
-		</dependency>
-
-		<!-- http://mvnrepository.com/artifact/jaxen/jaxen -->
-
+		
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-all</artifactId>
@@ -258,6 +244,5 @@
 			<artifactId>apple-id-snowflake</artifactId>
 		</dependency>
 		
-
 	</dependencies>
 </project>

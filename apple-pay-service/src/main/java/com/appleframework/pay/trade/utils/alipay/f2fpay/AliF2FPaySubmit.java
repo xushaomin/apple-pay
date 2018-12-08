@@ -61,8 +61,10 @@ public class AliF2FPaySubmit {
 
     private  AlipayTradeService tradeService;
 
-    private  AlipayTradeService tradeWithHBService;
+    @SuppressWarnings("unused")
+	private  AlipayTradeService tradeWithHBService;
 
+    @SuppressWarnings("unused")
     private  AlipayMonitorService monitorService;
 
 //    static {

@@ -66,7 +66,7 @@ public class AppPayController extends BaseController {
      * @return
      */
     @RequestMapping("/jsonPay")
-    public @ResponseBody Object initPay(Model model){
+    public @ResponseBody Object jsonPay(Model model){
         Map<String , Object> paramMap = new HashMap<String , Object>();
 
         //获取商户传入参数
