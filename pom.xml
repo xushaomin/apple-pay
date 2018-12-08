@@ -364,13 +364,7 @@
 			<dependency>
 				<groupId>com.appleframework.pay</groupId>
 				<artifactId>alipay-trade-sdk</artifactId>
-				<version>1.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.appleframework.pay</groupId>
-				<artifactId>alipay-sdk-java</artifactId>
-				<version>20161103220103</version>
+				<version>2.0</version>
 			</dependency>
 
 			<dependency>
@@ -406,6 +400,12 @@
 				<groupId>org.jdom</groupId>
 				<artifactId>jdom</artifactId>
 				<version>${jdom.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>dom4j</groupId>
+	  			<artifactId>dom4j</artifactId>
+				<version>1.6.1</version>
 			</dependency>
 			<!-- Other Common libs End -->
 		</dependencies>
