@@ -15,23 +15,36 @@
  */
 package com.appleframework.pay.trade.utils;
 
-import com.appleframework.pay.common.core.utils.StringUtil;
-import com.appleframework.pay.trade.entity.weixinpay.WeiXinPrePay;
-import com.appleframework.pay.trade.enums.weixinpay.WeiXinTradeTypeEnum;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import com.appleframework.pay.common.core.utils.StringUtil;
+import com.appleframework.pay.trade.entity.weixinpay.WeiXinPrePay;
+import com.appleframework.pay.trade.enums.weixinpay.WeiXinTradeTypeEnum;
 
 /**
  * <b>功能说明:微信支付工具类
@@ -310,25 +323,72 @@ public class WeiXinPayUtils {
      * @return
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     public static Map<String, String> parseXml(InputStream inputStream) throws Exception {
         if (inputStream == null){
             return null;
         }
-        Map<String, String> map = new HashMap<String, String>();// 将解析结果存储在HashMap中
-        SAXReader reader = new SAXReader();// 读取输入流
-        Document document = reader.read(inputStream);
-        Element root = document.getRootElement();// 得到xml根元素
-        List<Element> elementList = root.elements();// 得到根元素的所有子节点
-        for (Element e : elementList) {        // 遍历所有子节点
-            map.put(e.getName(), e.getText());
+		String resXml = "";
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			StringBuilder sb = new StringBuilder();
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+					sb.append(line + "\n");
+				}
+			} catch (IOException e) {
+				LOG.error("微信支付回调通知失败", e);
+			} finally {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					LOG.error("微信支付回调通知失败", e);
+				}
+			}
+			resXml = sb.toString();
+			LOG.info("微信支付异步通知请求包: {}", resXml);
+
+		} catch (Exception e) {
+			LOG.error("微信支付回调通知失败", e);
+			resXml = ""
+            		+ "<xml>"
+            		+ "<return_code>"
+            		+ "	<![CDATA[FAIL]]>"
+            		+ "</return_code>"
+            		+ "<return_msg>"
+            		+ "	<![CDATA[报文为空]]>"
+            		+ "</return_msg>"
+            		+ "</xml> ";
         }
-
-        inputStream.close();        // 释放资源
-        inputStream = null;
-
-        return map;
+        return parseXml(resXml);
     }
+    
+	public static Map<String, String> parseXml(String strXML) throws Exception {
+		try {
+			Map<String, String> data = new HashMap<String, String>();
+			DocumentBuilder documentBuilder = WXPayXmlUtil.newDocumentBuilder();
+			InputStream stream = new ByteArrayInputStream(strXML.getBytes("UTF-8"));
+			org.w3c.dom.Document doc = documentBuilder.parse(stream);
+			doc.getDocumentElement().normalize();
+			NodeList nodeList = doc.getDocumentElement().getChildNodes();
+			for (int idx = 0; idx < nodeList.getLength(); ++idx) {
+				Node node = nodeList.item(idx);
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+					data.put(element.getNodeName(), element.getTextContent());
+				}
+			}
+			try {
+				stream.close();
+			} catch (Exception ex) {
+				// do nothing
+			}
+			return data;
+		} catch (Exception ex) {
+			LOG.warn("Invalid XML, can not convert to map. Error message: " + ex.getMessage() + ". XML content: " + strXML);
+			throw ex;
+		}
+	}
     
     /**
 	 * 订单查询
