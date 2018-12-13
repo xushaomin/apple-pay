@@ -65,7 +65,7 @@ public class AppPayController extends BaseController {
      * 2:未传入支付通道参数,跳转到
      * @return
      */
-    @RequestMapping(value = "/jsonPay", produces="text/html")
+    @RequestMapping(value = "/jsonPay", produces="text/plain")
     public @ResponseBody Object jsonPay(Model model){
         Map<String , Object> paramMap = new HashMap<String , Object>();
 
