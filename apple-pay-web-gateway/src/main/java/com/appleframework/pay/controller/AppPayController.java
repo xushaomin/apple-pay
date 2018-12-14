@@ -128,6 +128,7 @@ public class AppPayController extends BaseController {
         			payWayCode, orderIp, orderPeriod, returnUrl, notifyUrl, remark, 
         			field1, field2, field3, field4, field5);
 
+        LOG.info("PrePay:" + appPayResultVo.getPrePay());
 		LOG.info("PAY返回:" + JSON.toJSONString(appPayResultVo));
         return appPayResultVo;
     }
