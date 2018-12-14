@@ -17,63 +17,74 @@ package com.appleframework.pay.trade.vo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
- * <b>功能说明:扫码支付结果展示实体
- * </b>
- * @author  Cruise.Xu
- * <a href="http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
+ * <b>功能说明:扫码支付结果展示实体 </b>
+ * 
+ * @author Cruise.Xu <a href=
+ *         "http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
  */
 public class AppPayResultVo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-     * 预付相关信息
-     */
-	private Object prePay;
-	
+	 * 预付相关信息
+	 */
+	private Map<String, String> prePay;
+
+	private String payBody;
+
 	/**
-     * 支付方式编码
-     */
-    private String payWayCode;
+	 * 支付方式编码
+	 */
+	private String payWayCode;
 
-    /** 金额 **/
-    private BigDecimal orderAmount;
+	/** 金额 **/
+	private BigDecimal orderAmount;
 
-    /** 产品名称 **/
-    private String productName;
+	/** 产品名称 **/
+	private String productName;
 
-    public String getPayWayCode() {
-        return payWayCode;
-    }
+	public String getPayWayCode() {
+		return payWayCode;
+	}
 
-    public void setPayWayCode(String payWayCode) {
-        this.payWayCode = payWayCode;
-    }
+	public void setPayWayCode(String payWayCode) {
+		this.payWayCode = payWayCode;
+	}
 
-    public BigDecimal getOrderAmount() {
-        return orderAmount;
-    }
+	public BigDecimal getOrderAmount() {
+		return orderAmount;
+	}
 
-    public void setOrderAmount(BigDecimal orderAmount) {
-        this.orderAmount = orderAmount;
-    }
+	public void setOrderAmount(BigDecimal orderAmount) {
+		this.orderAmount = orderAmount;
+	}
 
-    public String getProductName() {
-        return productName;
-    }
+	public String getProductName() {
+		return productName;
+	}
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 
-	public Object getPrePay() {
+	public Map<String, String> getPrePay() {
 		return prePay;
 	}
 
-	public void setPrePay(Object prePay) {
+	public void setPrePay(Map<String, String> prePay) {
 		this.prePay = prePay;
 	}
-    
+
+	public String getPayBody() {
+		return payBody;
+	}
+
+	public void setPayBody(String payBody) {
+		this.payBody = payBody;
+	}
+
 }

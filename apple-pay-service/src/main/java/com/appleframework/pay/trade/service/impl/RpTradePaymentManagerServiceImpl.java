@@ -82,6 +82,7 @@ import com.appleframework.pay.user.service.RpPayWayService;
 import com.appleframework.pay.user.service.RpUserInfoService;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
 import com.appleframework.pay.user.service.RpUserPayInfoService;
+import com.appleframework.pay.utils.UrlMapUtility;
 import com.taobao.diamond.utils.JSONUtils;
 
 /**
@@ -936,7 +937,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			String prePayMessage = null;
 			try {
 				AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-				if(response.isSuccess()){ 
+				if(response.isSuccess()){
 					prePayMessage = response.getBody();
 				} else {
 					LOG.error("AlipayTradeAppPayResponse Error!");
@@ -953,8 +954,8 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
 			appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
 			//appPayResultVo.setPrePay(prePayMessage.replaceAll("&", "&amp;"));
-			appPayResultVo.setPrePay(prePayMessage);
-			appPayResultVo.setSellerId(seller_id);
+			appPayResultVo.setPayBody(prePayMessage);
+			appPayResultVo.setPrePay(UrlMapUtility.split(prePayMessage));
 
 		} else if (PayWayEnum.APPLE.name().equals(payWayCode)){//苹果支付
             Map<String, String> sParaTemp = new HashMap<String, String>();
