@@ -955,7 +955,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
 			//appPayResultVo.setPrePay(prePayMessage.replaceAll("&", "&amp;"));
 			appPayResultVo.setPayBody(prePayMessage);
-			Map<String, String> prePay = UrlMapUtility.split(prePayMessage);
+			Map<String, String> prePay = UrlMapUtility.splitAndDecode(prePayMessage);
 			prePay.put("seller_id", seller_id);
 			appPayResultVo.setPrePay(prePay);
 
