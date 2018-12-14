@@ -952,7 +952,8 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			appPayResultVo.setPayWayCode(PayWayEnum.ALIPAY.name());
 			appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
 			appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
-			appPayResultVo.setPrePay(prePayMessage.replaceAll("&", "&amp;"));
+			//appPayResultVo.setPrePay(prePayMessage.replaceAll("&", "&amp;"));
+			appPayResultVo.setPrePay(prePayMessage);
 
 		} else if (PayWayEnum.APPLE.name().equals(payWayCode)){//苹果支付
             Map<String, String> sParaTemp = new HashMap<String, String>();
