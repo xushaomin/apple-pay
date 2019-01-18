@@ -1069,6 +1069,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				} else {
 					LOG.error("错误的加密方式:" + signType);
 				}
+				LOG.info("signType:" + signType);
 			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
 				if (signType.equalsIgnoreCase("MD5")) {
 					decryptKey = AlipayConfigUtil.key;
@@ -1084,10 +1085,13 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			LOG.info("Pre AlipayNotify:" + notifyMap);
 			
 			String charset = AlipayConfigUtil.input_charset;
+			LOG.info("charset:" + charset);
 			boolean verifyResult = false;
 			try {
 				verifyResult = AlipaySignature.rsaCheckV2(notifyMap, decryptKey, charset);
+				LOG.info("verifyResult:" + verifyResult);
 			} catch (AlipayApiException e) {
+				LOG.info("verifyResult:" + e.getStackTrace());
 				LOG.error(e.getErrCode() + ":" + e.getErrMsg());
 			}
 			
