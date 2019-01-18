@@ -1086,7 +1086,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			String charset = AlipayConfigUtil.input_charset;
 			boolean verifyResult = false;
 			try {
-				verifyResult = AlipaySignature.rsaCheckV1(notifyMap, decryptKey, charset);
+				verifyResult = AlipaySignature.rsaCheckV2(notifyMap, decryptKey, charset);
 			} catch (AlipayApiException e) {
 				LOG.error(e.getErrCode() + ":" + e.getErrMsg());
 			}
