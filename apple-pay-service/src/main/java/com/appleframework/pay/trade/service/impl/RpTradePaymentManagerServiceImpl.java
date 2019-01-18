@@ -32,7 +32,6 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.appleframework.config.core.PropertyConfigurer;
@@ -1069,7 +1068,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				} else {
 					LOG.error("错误的加密方式:" + signType);
 				}
-				LOG.info("signType:" + signType);
+				LOG.info("MERCHANT_RECEIVES -> signType:" + signType);
 			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(fundIntoType)) {// 平台收款
 				if (signType.equalsIgnoreCase("MD5")) {
 					decryptKey = AlipayConfigUtil.key;
@@ -1078,6 +1077,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				} else {
 					LOG.error("错误的加密方式:" + signType);
 				}
+				LOG.info("PLAT_RECEIVES -> signType:" + signType);
 			} else {
 				LOG.error("错误的收款方式:" + fundIntoType);
 			}
@@ -1085,16 +1085,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			LOG.info("Pre AlipayNotify:" + notifyMap);
 			
 			String charset = AlipayConfigUtil.input_charset;
-			LOG.info("charset:" + charset);
-			boolean verifyResult = false;
-			try {
-				verifyResult = AlipaySignature.rsaCheckV2(notifyMap, decryptKey, charset);
-				LOG.info("verifyResult:" + verifyResult);
-			} catch (AlipayApiException e) {
-				LOG.info("verifyResult:" + e.getStackTrace());
-				LOG.error(e.getErrCode() + ":" + e.getErrMsg());
-			}
-			
+			LOG.info("sign charset:" + charset);
+			boolean verifyResult = AlipayNotify.verify(partnerKey, decryptKey, notifyMap);
+			LOG.info("verifyResult:" + verifyResult);
 			if (verifyResult) {// 验证成功
 				String tradeStatus = notifyMap.get("trade_status");
 				LOG.info("AFT AlipayNotify:tradeStatus=" + tradeStatus);
@@ -1246,8 +1239,8 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			}
 			
 			//计算得出通知验证结果
-			boolean verify_result = AlipayNotify.verify(partnerKey, decryptKey, resultMap);
-			if (verify_result) {// 验证成功
+			boolean verifyResult = AlipayNotify.verify(partnerKey, decryptKey, resultMap);
+			if (verifyResult) {// 验证成功
 				String trade_status = resultMap.get("trade_status");
 				if (trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")) {
 					String resultUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getReturnUrl(), TradeStatusEnum.SUCCESS);
