@@ -496,6 +496,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			LOG.info("completeSuccessOrder:getPayTypeCode:" + rpTradePaymentOrder.getPayTypeCode());
 			return;
 		} else {
+			LOG.info("completeSuccessOrder------->>>>");
 			String notifyUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getNotifyUrl(), TradeStatusEnum.SUCCESS);
 			LOG.info("completeSuccessOrder:notifyUrl:" + notifyUrl);
 			rpNotifyService.notifySend(notifyUrl, rpTradePaymentRecord.getMerchantOrderNo(), rpTradePaymentRecord.getMerchantNo());
@@ -504,8 +505,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
 
     private String getMerchantNotifyUrl(RpTradePaymentRecord rpTradePaymentRecord ,RpTradePaymentOrder rpTradePaymentOrder ,String sourceUrl , TradeStatusEnum tradeStatusEnum){
-
+    	LOG.info("completeSuccessOrder------->>>>getMerchantNotifyUrl");
         RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByUserNo(rpTradePaymentRecord.getMerchantNo());
+        LOG.info("getMerchantNotifyUrl:rpUserPayConfig:" + rpUserPayConfig);
         if (rpUserPayConfig == null){
             throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR,"用户支付配置有误");
         }
@@ -543,10 +545,14 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         String field5 = rpTradePaymentOrder.getField5(); // 扩展字段5
         paramMap.put("field5",field5);
 
+        LOG.info("getMerchantNotifyUrl:paramMap:" + paramMap);
+        
         String paramStr = MerchantApiUtil.getParamStr(paramMap);
         String sign = MerchantApiUtil.getSign(paramMap, rpUserPayConfig.getPaySecret());
         String notifyUrl = sourceUrl + "?" + paramStr + "&sign=" + sign;
 
+        LOG.info("getMerchantNotifyUrl:paramStr:" + paramStr);
+        LOG.info("getMerchantNotifyUrl:notifyUrl:" + notifyUrl);
         return notifyUrl;
     }
 
