@@ -7,6 +7,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -35,6 +37,8 @@ import com.appleframework.pay.notify.service.RpNotifyService;
 @Service("rpNotifyService")
 public class RpNotifyServiceImpl implements RpNotifyService {
 	
+    private static final Logger LOG = LoggerFactory.getLogger(RpNotifyServiceImpl.class);
+
 	@Autowired
 	private JmsTemplate notifyJmsTemplate;
 
@@ -60,6 +64,9 @@ public class RpNotifyServiceImpl implements RpNotifyService {
 	@Override
 	public void notifySend(String notifyUrl, String merchantOrderNo, String merchantNo) {
 
+		LOG.info("RpNotifyServiceImpl.notifySend:notifyUrl" + notifyUrl);
+		LOG.info("RpNotifyServiceImpl.notifySend:merchantOrderNo" + merchantOrderNo);
+		LOG.info("RpNotifyServiceImpl.notifySend:merchantNo" + merchantNo);
 		RpNotifyRecord record = new RpNotifyRecord();
 		record.setNotifyTimes(0);
 		record.setLimitNotifyTimes(5);
@@ -71,8 +78,10 @@ public class RpNotifyServiceImpl implements RpNotifyService {
 
 		Object toJSON = JSONObject.toJSON(record);
 		final String str = toJSON.toString();
+		LOG.info("RpNotifyServiceImpl.notifySend:json:" + str);
 		
-		String merchantNotifyQueueName = PropertyConfigurer.getString(MqConfig.MERCHANT_NOTIFY_QUEUE);		
+		String merchantNotifyQueueName = PropertyConfigurer.getString(MqConfig.MERCHANT_NOTIFY_QUEUE);
+		LOG.info("RpNotifyServiceImpl.notifySend:merchantNotifyQueueName:" + merchantNotifyQueueName);
 		notifyJmsTemplate.setDefaultDestinationName(merchantNotifyQueueName);
 		notifyJmsTemplate.send(new MessageCreator() {
 			public Message createMessage(Session session) throws JMSException {

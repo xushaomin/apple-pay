@@ -465,6 +465,10 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
      */
 	private void completeSuccessOrder(RpTradePaymentRecord rpTradePaymentRecord, String bankTrxNo, Date timeEnd, String bankReturnMsg) {
 
+		LOG.info("completeSuccessOrder:rpTradePaymentRecord:" + rpTradePaymentRecord);
+		LOG.info("completeSuccessOrder:bankTrxNo:" + bankTrxNo);
+		LOG.info("completeSuccessOrder:timeEnd:" + timeEnd);
+		LOG.info("completeSuccessOrder:bankReturnMsg:" + bankReturnMsg);
 		rpTradePaymentRecord.setPaySuccessTime(timeEnd);
 		rpTradePaymentRecord.setBankTrxNo(bankTrxNo);// 设置银行流水号
 		rpTradePaymentRecord.setBankReturnMsg(bankReturnMsg);
@@ -475,6 +479,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		rpTradePaymentOrder.setStatus(TradeStatusEnum.SUCCESS.name());
 		rpTradePaymentOrder.setTrxNo(rpTradePaymentRecord.getTrxNo());// 设置支付平台支付流水号
 		rpTradePaymentOrderDao.update(rpTradePaymentOrder);
+		
+		LOG.info("completeSuccessOrder:rpTradePaymentOrder:" + rpTradePaymentOrder);
+		LOG.info("completeSuccessOrder:TrxNo:" + rpTradePaymentRecord.getTrxNo());
 
 		//if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentRecord.getFundIntoType())) {
 			rpAccountTransactionService.creditToAccount(rpTradePaymentRecord.getMerchantNo(),
@@ -486,9 +493,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
 		if (PayTypeEnum.F2F_PAY.name().equals(rpTradePaymentOrder.getPayTypeCode())) {
 			// 支付宝	条码支付实时返回支付结果,不需要商户通知
+			LOG.info("completeSuccessOrder:getPayTypeCode:" + rpTradePaymentOrder.getPayTypeCode());
 			return;
 		} else {
 			String notifyUrl = getMerchantNotifyUrl(rpTradePaymentRecord, rpTradePaymentOrder, rpTradePaymentRecord.getNotifyUrl(), TradeStatusEnum.SUCCESS);
+			LOG.info("completeSuccessOrder:notifyUrl:" + notifyUrl);
 			rpNotifyService.notifySend(notifyUrl, rpTradePaymentRecord.getMerchantOrderNo(), rpTradePaymentRecord.getMerchantNo());
 		}
 	}
