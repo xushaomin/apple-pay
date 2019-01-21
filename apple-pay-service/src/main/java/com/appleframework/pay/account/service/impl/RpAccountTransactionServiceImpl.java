@@ -107,10 +107,17 @@ public class RpAccountTransactionServiceImpl implements RpAccountTransactionServ
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public RpAccount creditToAccount(String userNo, BigDecimal amount, String requestNo, String bankTrxNo, String trxType, String remark) {
+		LOG.info("creditToAccount ----> userNo:" + userNo);
+		LOG.info("creditToAccount ----> amount:" + amount);
+		LOG.info("creditToAccount ----> requestNo:" + requestNo);
+		LOG.info("creditToAccount ----> bankTrxNo:" + bankTrxNo);
+		LOG.info("creditToAccount ----> trxType:" + trxType);
+		LOG.info("creditToAccount ----> trxType:" + remark);
 		RpAccount account = this.getByUserNo_IsPessimist(userNo, true);
 		if (account == null) {
 			//account = new RpAccount();
 			//account.setAccountNo(userNo);
+			LOG.info("creditToAccount ----> account is null");
 			throw AccountBizException.ACCOUNT_NOT_EXIT;
 		}
 
@@ -138,6 +145,9 @@ public class RpAccountTransactionServiceImpl implements RpAccountTransactionServ
 
 		String completeSett = PublicEnum.NO.name();
 		String isAllowSett = PublicEnum.YES.name();
+		
+		LOG.info("creditToAccount ----> completeSett:" + completeSett);
+		LOG.info("creditToAccount ----> isAllowSett:" + isAllowSett);
 
 		/** 设置余额的值 **/
 		account.setBalance(account.getBalance().add(amount));
@@ -159,6 +169,9 @@ public class RpAccountTransactionServiceImpl implements RpAccountTransactionServ
 		accountHistoryEntity.setAccountNo(account.getAccountNo());
 		accountHistoryEntity.setTrxType(trxType);
 		accountHistoryEntity.setUserNo(userNo);
+		
+		LOG.info("creditToAccount ----> accountHistoryEntity:" + accountHistoryEntity);
+		LOG.info("creditToAccount ----> account:" + account);
 
 		this.rpAccountHistoryDao.insert(accountHistoryEntity);
 		this.rpAccountDao.update(account);

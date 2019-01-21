@@ -45,7 +45,7 @@ public class AlipayConfigUtil {
 	// 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
 	public static final String notify_url = PropertyConfigurer.getString("alipay.notify_url");
 	
-	public static final String notify_sign = PropertyConfigurer.getString("alipay.notify_sign");
+	public static String notify_sign = PropertyConfigurer.getString("alipay.notify_sign");
 
 	// 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
 	public static final String return_url = PropertyConfigurer.getString("alipay.return_url");
@@ -57,7 +57,7 @@ public class AlipayConfigUtil {
 	public static final String log_path = PropertyConfigurer.getString("alipay.log_path");
 		
 	// 字符编码格式 目前支持 gbk 或 utf-8
-	public static final String input_charset = PropertyConfigurer.getString("alipay.input_charset");
+	public static final String input_charset = PropertyConfigurer.getString("alipay.input_charset", " utf-8");
 		
 	// 支付类型 ，无需修改
 	public static final String payment_type = PropertyConfigurer.getString("alipay.payment_type");
