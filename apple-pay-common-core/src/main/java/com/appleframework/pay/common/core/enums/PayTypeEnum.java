@@ -43,7 +43,11 @@ public enum PayTypeEnum {
 
 	APP_PAY("ALIPAY","APP支付"),
 	
-	IN_APP("APPLE","苹果内购");
+	IN_APP("APPLE","苹果内购"),
+	
+	WX_TRANSFER("WEIXIN","微信转账"),
+	
+	ALI_TRANSFER("ALIPAY","支付宝转账");
 
 	/** 所属支付方式 */
     private String way;
