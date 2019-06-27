@@ -92,8 +92,7 @@
 		success_refund_amount, trx_type, order_from,
 		pay_type_code, pay_type_name, fund_into_type,
 		remark, bank_return_msg , field1,
-		field2,
-		field3, field4, field5
+		field2, field3, field4, field5
 		)
 		values (#{id,jdbcType=VARCHAR}, #{version,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP},
 		#{status,jdbcType=VARCHAR}, #{editor,jdbcType=VARCHAR}, #{creater,jdbcType=VARCHAR},
@@ -131,8 +130,7 @@
 		merchant_name = #{merchantName,jdbcType=VARCHAR},
 		merchant_no = #{merchantNo,jdbcType=VARCHAR},
 		payer_user_no = #{payerUserNo,jdbcType=VARCHAR},
-		payer_name =
-		#{payerName,jdbcType=VARCHAR},
+		payer_name = #{payerName,jdbcType=VARCHAR},
 		payer_pay_amount = #{payerPayAmount,jdbcType=DECIMAL},
 		payer_fee = #{payerFee,jdbcType=DECIMAL},
 		payer_account_type = #{payerAccountType,jdbcType=VARCHAR},
@@ -146,8 +144,7 @@
 		order_amount = #{orderAmount,jdbcType=DECIMAL},
 		plat_income = #{platIncome,jdbcType=DECIMAL},
 		fee_rate = #{feeRate,jdbcType=DECIMAL},
-		plat_cost =
-		#{platCost,jdbcType=DECIMAL},
+		plat_cost = #{platCost,jdbcType=DECIMAL},
 		plat_profit = #{platProfit,jdbcType=DECIMAL},
 		return_url = #{returnUrl,jdbcType=VARCHAR},
 		notify_url = #{notifyUrl,jdbcType=VARCHAR},
@@ -162,8 +159,7 @@
 		order_from = #{orderFrom,jdbcType=VARCHAR},
 		pay_type_code = #{payTypeCode,jdbcType=VARCHAR},
 		pay_type_name = #{payTypeName,jdbcType=VARCHAR},
-		fund_into_type =
-		#{fundIntoType,jdbcType=VARCHAR},
+		fund_into_type = #{fundIntoType,jdbcType=VARCHAR},
 		remark = #{remark,jdbcType=VARCHAR},
 		bank_return_msg = #{bankReturnMsg,jdbcType=VARCHAR},
 		field1 = #{field1,jdbcType=VARCHAR},
