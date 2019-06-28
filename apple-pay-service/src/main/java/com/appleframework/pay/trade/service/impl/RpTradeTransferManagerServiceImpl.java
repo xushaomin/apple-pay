@@ -375,7 +375,6 @@ public class RpTradeTransferManagerServiceImpl implements RpTradeTransferManager
 	            	completeFailOrder(rpTradePaymentRecord, response.getBody());
 	            }	            
 			} catch (AlipayApiException e) {
-				e.printStackTrace();
 				
 				LOG.info("支付宝exception={}", e.getMessage());
 	            rpTradePaymentRecord.setBankReturnMsg(e.getErrMsg());
@@ -384,6 +383,7 @@ public class RpTradeTransferManagerServiceImpl implements RpTradeTransferManager
 	            completeFailOrder(rpTradePaymentRecord, e.getMessage());
 			}
 			
+			transferResultVo.setOrderNo(rpTradeTransferOrder.getMerchantOrderNo());
 			transferResultVo.setOrderAmount(amount);//设置跳转地址
 			transferResultVo.setOrderName(rpTradeTransferOrder.getOrderName());
 			transferResultVo.setPayWayCode(payWayCode);
