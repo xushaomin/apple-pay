@@ -47,9 +47,9 @@ import com.appleframework.pay.user.service.RpUserPayConfigService;
  */
 @Controller
 @RequestMapping(value = "/trade")
-public class FundTransController extends BaseController {
+public class TradeTransferController extends BaseController {
 	
-    private static final Logger LOG = LoggerFactory.getLogger(FundTransController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TradeTransferController.class);
 
     @Autowired
     private RpTradeTransferManagerService rpTradeTransferManagerService;
@@ -96,7 +96,7 @@ public class FundTransController extends BaseController {
 		paramMap.put("orderPrice", orderPriceStr);
         String orderDateStr = getString_UrlDecode_UTF8("orderDate"); // 订单日期
         paramMap.put("orderDate",orderDateStr);
-        String orderTimeStr = getString_UrlDecode_UTF8("orderTime"); // 订单日期
+        String orderTimeStr = getString_UrlDecode_UTF8("orderTime"); // 订单时间
         paramMap.put("orderTime",orderTimeStr);
         String orderPeriodStr = getString_UrlDecode_UTF8("orderPeriod"); // 订单有效期
         paramMap.put("orderPeriod",orderPeriodStr);
