@@ -373,6 +373,7 @@ public class RpTradeTransferManagerServiceImpl implements RpTradeTransferManager
 	            }
 	            else {
 	            	completeFailOrder(rpTradePaymentRecord, response.getBody());
+	            	throw new TradeBizException(TradeBizException.TRADE_ORDER_STATUS_NOT_SUCCESS, response.getSubMsg());
 	            }	            
 			} catch (AlipayApiException e) {
 				
