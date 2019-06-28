@@ -120,8 +120,8 @@ public class TradeTransferController extends BaseController {
             throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
         }
 
-		String payeeAccount = null; 
-		String payeeName = null;
+		String payeeAccount = orderAccount; 
+		String payeeName = realName;
 		BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
 		TransferResultVo transferResultVo = rpTradeTransferManagerService.initDirectTransfer(
 				payKey, payeeAccount, payeeName, orderName, orderNo, orderDate, orderTime, orderPrice, 
