@@ -920,8 +920,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
 			if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())) {// 商户收款
 				// 根据资金流向获取配置信息
-				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(),
-						payWayCode);
+				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(), payWayCode);
 				app_id = rpUserPayInfo.getAppId();
 				seller_id = rpUserPayInfo.getMerchantId();
 				rsa_private_key = rpUserPayInfo.getRsaPrivateKey();
@@ -1325,8 +1324,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
      * @param field5    扩展字段5
      * @return
      */
-    private RpTradePaymentOrder sealRpTradePaymentOrder(String merchantNo, String merchantName ,String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice,
-                                                        String payWay,String payWayName , PayTypeEnum payType , String fundIntoType , String orderIp, Integer orderPeriod, String returnUrl, String notifyUrl, String remark, String field1, String field2, String field3, String field4, String field5){
+    private RpTradePaymentOrder sealRpTradePaymentOrder(
+    		String merchantNo, String merchantName ,String productName, String orderNo, Date orderDate, Date orderTime, 
+    		BigDecimal orderPrice, String payWay,String payWayName , PayTypeEnum payType , String fundIntoType , 
+    		String orderIp, Integer orderPeriod, String returnUrl, String notifyUrl, String remark, 
+    		String field1, String field2, String field3, String field4, String field5){
 
         RpTradePaymentOrder rpTradePaymentOrder = new RpTradePaymentOrder();
         rpTradePaymentOrder.setProductName(productName);//商品名称
@@ -1425,8 +1427,11 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
      * @param field5    扩展字段5
      * @return
      */
-    private RpTradePaymentRecord sealRpTradePaymentRecord(String merchantNo, String merchantName ,String productName, String orderNo, BigDecimal orderPrice , String payWay , String payWayName , PayTypeEnum payType , String fundIntoType , BigDecimal feeRate ,
-                                                          String orderIp , String returnUrl, String notifyUrl, String remark, String field1, String field2, String field3, String field4, String field5){
+    private RpTradePaymentRecord sealRpTradePaymentRecord(
+    		String merchantNo, String merchantName ,String productName, String orderNo, BigDecimal orderPrice , 
+    		String payWay , String payWayName , PayTypeEnum payType , String fundIntoType , BigDecimal feeRate ,
+          	String orderIp , String returnUrl, String notifyUrl, String remark, String field1, String field2, 
+          	String field3, String field4, String field5){
         RpTradePaymentRecord rpTradePaymentRecord = new RpTradePaymentRecord();
         rpTradePaymentRecord.setProductName(productName);//产品名称
         rpTradePaymentRecord.setMerchantOrderNo(orderNo);//产品编号
@@ -1492,8 +1497,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
      * @param orderIp   下单IP
      * @return
      */
-    private WeiXinPrePay sealWeixinPerPay(String appId ,String mchId ,String productName ,String remark ,String bankOrderNo ,BigDecimal orderPrice , Date orderTime , Integer orderPeriod ,WeiXinTradeTypeEnum weiXinTradeTypeEnum ,
-                                            String productId ,String openId ,String orderIp){
+    private WeiXinPrePay sealWeixinPerPay(String appId ,String mchId ,String productName ,String remark ,
+    		String bankOrderNo ,BigDecimal orderPrice , Date orderTime , Integer orderPeriod, 
+    		WeiXinTradeTypeEnum weiXinTradeTypeEnum , String productId ,String openId ,String orderIp){
         WeiXinPrePay weiXinPrePay = new WeiXinPrePay();
 
         weiXinPrePay.setAppid(appId);
