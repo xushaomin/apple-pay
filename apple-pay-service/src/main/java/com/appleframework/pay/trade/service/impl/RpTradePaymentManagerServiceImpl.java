@@ -867,12 +867,14 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
             String appid = "";
             String mch_id = "";
             String partnerKey = "";
+            String offlineAppid = "";
             if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//商户收款
                 //根据资金流向获取配置信息
                 RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(),payWayCode);
                 appid = rpUserPayInfo.getAppId();
                 mch_id = rpUserPayInfo.getMerchantId();
                 partnerKey = rpUserPayInfo.getPartnerKey();
+                offlineAppid = rpUserPayInfo.getOfflineAppId();
             }else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())){//平台收款
                 appid = PropertyConfigurer.getString("weixinpay.appId");
                 mch_id = PropertyConfigurer.getString("weixinpay.mch_id");
@@ -901,6 +903,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
                     
                     //再次前面返回给APP
                     Map<String, String> prePay = WeiXinPayUtils.getPrePayMapForAPP(prePayRequest, partnerKey);
+                    prePay.put("offlineAppId", offlineAppid);
                     appPayResultVo.setPrePay(prePay);
                 } else {
                     throw new TradeBizException(TradeBizException.TRADE_WEIXIN_ERROR,"微信返回结果签名异常");
