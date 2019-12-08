@@ -131,9 +131,9 @@ public class WeiXinPayUtils {
         sb.append("<mch_id>").append(weiXinPrePay.getMchId()).append("</mch_id>");
         sb.append("<nonce_str>").append(weiXinPrePay.getNonceStr()).append("</nonce_str>");
         sb.append("<notify_url>").append(weiXinPrePay.getNotifyUrl()).append("</notify_url>");
-        if (WeiXinTradeTypeEnum.NATIVE.name().equals(weiXinPrePay.getTradeType())){
+        if (WeiXinTradeTypeEnum.NATIVE.name().equals(weiXinPrePay.getTradeType().name())){
             sb.append("<product_id>").append(weiXinPrePay.getProductId()).append("</product_id>");
-        }else if (WeiXinTradeTypeEnum.JSAPI.name().equals(weiXinPrePay.getTradeType())){
+        }else if (WeiXinTradeTypeEnum.JSAPI.name().equals(weiXinPrePay.getTradeType().name())){
             sb.append("<openid>").append(weiXinPrePay.getOpenid()).append("</openid>");
         }
         sb.append("<out_trade_no>").append(weiXinPrePay.getOutTradeNo()).append("</out_trade_no>");
@@ -235,17 +235,63 @@ public class WeiXinPayUtils {
         prePayMap.put("time_expire", weiXinPrePay.getTimeExpire()); // 截止时间
         prePayMap.put("notify_url", weiXinPrePay.getNotifyUrl()); // 接收财付通通知的URL
         prePayMap.put("trade_type", weiXinPrePay.getTradeType().name()); // 交易类型
-        if (WeiXinTradeTypeEnum.NATIVE.name().equals(weiXinPrePay.getTradeType())){
-            prePayMap.put("product_id", weiXinPrePay.getProductId()); //商品ID
-        }else if (WeiXinTradeTypeEnum.JSAPI.name().equals(weiXinPrePay.getTradeType())){
-            prePayMap.put("openid", weiXinPrePay.getOpenid()); // openid
+        if (WeiXinTradeTypeEnum.NATIVE.name().equals(weiXinPrePay.getTradeType().name())){
+        	prePayMap.put("product_id", weiXinPrePay.getProductId()); //商品ID
+        }else if (WeiXinTradeTypeEnum.JSAPI.name().equals(weiXinPrePay.getTradeType().name())){
+        	prePayMap.put("openid", weiXinPrePay.getOpenid()); // openid
         }
+        
+        //if (WeiXinTradeTypeEnum.NATIVE.name().equals(weiXinPrePay.getTradeType())){
+        //    prePayMap.put("product_id", weiXinPrePay.getProductId()); //商品ID
+        //}else if (WeiXinTradeTypeEnum.JSAPI.name().equals(weiXinPrePay.getTradeType())){
+        //    prePayMap.put("openid", weiXinPrePay.getOpenid()); // openid
+        //}
 
         String argPreSign = getStringByMap(prePayMap) + "&key=" + partnerKey;
         String preSign = MD5Util.encode(argPreSign).toUpperCase();
         weiXinPrePay.setSign(preSign);
     }
     
+    /**
+     * 获取预支付请求签名
+     * @param weiXinPrePay
+     * @param partnerKey
+     * @return
+     */
+	public static Map<String, String> getPrePayMapForJSAPI(Map<String, Object> prePayRequest, String partnerKey) {
+
+		// 应用ID appid String(32) 是 wx8888888888888888 微信开放平台审核通过的应用APPID
+		// 商户号 partnerid String(32) 是 1900000109 微信支付分配的商户号
+		// 预支付交易会话ID prepayid String(32) 是 WX1217752501201407033233368018
+		// 微信返回的支付交易会话ID
+		// 扩展字段 package String(128) 是 Sign=WXPay 暂填写固定值Sign=WXPay
+		// 随机字符串 noncestr String(32) 是 5K8264ILTKCH16CQ2502SI8ZNMTM67VS
+		// 随机字符串，不长于32位。推荐随机数生成算法
+		// 时间戳 timestamp String(10) 是 1412000000 时间戳，请见接口规则-参数规定
+		// 签名 sign String(32) 是 C380BEC2BFD727A4B6845133519F3AD6 签名，详见签名生成算法
+
+		Map<String, String> prePayMap = new HashMap<String, String>();
+		prePayMap.put("appId", prePayRequest.get("appid").toString());// 公众账号ID
+		prePayMap.put("timeStamp", String.valueOf(System.currentTimeMillis()).substring(0, 10)); // 时间戳
+		prePayMap.put("nonceStr", prePayRequest.get("nonce_str").toString()); // 随机字符串
+		prePayMap.put("package", "prepay_id=" + prePayRequest.get("prepay_id").toString()); // 扩展字段
+		prePayMap.put("signType", "MD5");
+		prePayMap.put("sign", getPrePaySignForJSAPI(prePayMap, partnerKey)); // 扩展字段
+		return prePayMap;
+	}
+    
+	public static String getPrePaySignForJSAPI(Map<String, String> result, String  partnerKey) {
+        String argNotifySign = getStringByStringMap(result) + "&key=" + partnerKey;
+        if(LOG.isInfoEnabled()) {
+        	LOG.info("argNotifySign=" + argNotifySign);
+        }
+        String notifySign = MD5Util.encode(argNotifySign).toUpperCase();
+        if(LOG.isInfoEnabled()) {
+        	LOG.info("notifySign=" + notifySign);
+        }
+        return notifySign;
+    }
+	
     /**
      * 获取预支付请求签名
      * @param weiXinPrePay

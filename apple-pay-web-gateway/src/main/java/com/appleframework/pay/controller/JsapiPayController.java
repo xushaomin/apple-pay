@@ -47,10 +47,10 @@ import com.appleframework.pay.user.service.RpUserPayConfigService;
  * <a href="http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
  */
 @Controller
-@RequestMapping(value = "/appPay")
-public class AppPayController extends BaseController {
+@RequestMapping(value = "/jsapiPay")
+public class JsapiPayController extends BaseController {
 	
-    private static final Logger LOG = LoggerFactory.getLogger(AppPayController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsapiPayController.class);
 
     @Autowired
     private RpTradePaymentManagerService rpTradePaymentManagerService;
@@ -122,14 +122,14 @@ public class AppPayController extends BaseController {
 		if (!MerchantApiUtil.isRightSign(paramMap, rpUserPayConfig.getPaySecret(), sign)) {
             throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
         }
-		
+
 		BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
 		
 		OrderPayBo orderPayBo = changToOrderBo(productName, orderNo, orderDate, orderTime, orderPrice, 
 		    	 orderIp, orderPeriod, returnUrl, notifyUrl, remark, 
 		    	 field1, field2, field3, field4, field5);
 		
-        AppPayResultVo appPayResultVo = rpTradePaymentManagerService.initDirectAppPay(payKey, payWayCode, orderPayBo);
+        AppPayResultVo appPayResultVo = rpTradePaymentManagerService.initDirectJsapiPay(payKey, payWayCode, orderPayBo);
 
         LOG.info("PrePay:" + appPayResultVo.getPrePay());
 		LOG.info("PAY返回:" + JSON.toJSONString(appPayResultVo));

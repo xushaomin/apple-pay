@@ -26,6 +26,7 @@ import com.appleframework.pay.common.core.entity.BaseEntity;
  */
 public class RpPayWay extends BaseEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     private String payWayCode;
 
@@ -40,9 +41,6 @@ public class RpPayWay extends BaseEntity implements Serializable {
     private Integer sorts;
 
     private Double payRate;
-
-    private static final long serialVersionUID = 1L;
-
 
     public String getPayWayCode() {
         return payWayCode;

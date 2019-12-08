@@ -40,6 +40,7 @@ import com.appleframework.pay.common.core.utils.StringUtil;
 import com.appleframework.pay.controller.common.BaseController;
 import com.appleframework.pay.service.CnpPayService;
 import com.appleframework.pay.trade.exception.TradeBizException;
+import com.appleframework.pay.trade.model.OrderPayBo;
 import com.appleframework.pay.trade.service.RpTradePaymentManagerService;
 import com.appleframework.pay.trade.service.RpTradePaymentQueryService;
 import com.appleframework.pay.trade.utils.MerchantApiUtil;
@@ -88,46 +89,46 @@ public class ScanPayController extends BaseController {
         Map<String , Object> paramMap = new HashMap<String , Object>();
 
         //获取商户传入参数
-        String payKey = getString_UrlDecode_UTF8("payKey"); // 企业支付KEY
-        paramMap.put("payKey",payKey);
-        String productName = getString_UrlDecode_UTF8("productName"); // 商品名称
-        paramMap.put("productName",productName);
-        String orderNo = getString_UrlDecode_UTF8("orderNo"); // 订单编号
-        paramMap.put("orderNo",orderNo);
-        String orderPriceStr = getString_UrlDecode_UTF8("orderPrice"); // 订单金额 , 单位:元
-        paramMap.put("orderPrice",orderPriceStr);
-        String payWayCode = getString_UrlDecode_UTF8("payWayCode"); // 支付方式编码 支付宝: ALIPAY  微信:WEIXIN
-        paramMap.put("payWayCode",payWayCode);
-        String orderIp = getString_UrlDecode_UTF8("orderIp"); // 下单IP
-        paramMap.put("orderIp",orderIp);
-        String orderDateStr = getString_UrlDecode_UTF8("orderDate"); // 订单日期
-        paramMap.put("orderDate",orderDateStr);
-        String orderTimeStr = getString_UrlDecode_UTF8("orderTime"); // 订单日期
-        paramMap.put("orderTime",orderTimeStr);
-        String orderPeriodStr = getString_UrlDecode_UTF8("orderPeriod"); // 订单有效期
-        paramMap.put("orderPeriod",orderPeriodStr);
-        String returnUrl = getString_UrlDecode_UTF8("returnUrl"); // 页面通知返回url
-        paramMap.put("returnUrl",returnUrl);
-        String notifyUrl = getString_UrlDecode_UTF8("notifyUrl"); // 后台消息通知Url
-        paramMap.put("notifyUrl",notifyUrl);
-        String remark = getString_UrlDecode_UTF8("remark"); // 支付备注
-        paramMap.put("remark",remark);
-        String sign = getString_UrlDecode_UTF8("sign"); // 签名
+		String payKey = getString_UrlDecode_UTF8("payKey"); // 企业支付KEY
+		paramMap.put("payKey", payKey);
+		String productName = getString_UrlDecode_UTF8("productName"); // 商品名称
+		paramMap.put("productName", productName);
+		String orderNo = getString_UrlDecode_UTF8("orderNo"); // 订单编号
+		paramMap.put("orderNo", orderNo);
+		String orderPriceStr = getString_UrlDecode_UTF8("orderPrice"); // 订单金额 , 单位:元
+		paramMap.put("orderPrice", orderPriceStr);
+		String payWayCode = getString_UrlDecode_UTF8("payWayCode"); // 支付方式编码 支付宝: ALIPAY 微信:WEIXIN
+		paramMap.put("payWayCode", payWayCode);
+		String orderIp = getString_UrlDecode_UTF8("orderIp"); // 下单IP
+		paramMap.put("orderIp", orderIp);
+		String orderDateStr = getString_UrlDecode_UTF8("orderDate"); // 订单日期
+		paramMap.put("orderDate", orderDateStr);
+		String orderTimeStr = getString_UrlDecode_UTF8("orderTime"); // 订单日期
+		paramMap.put("orderTime", orderTimeStr);
+		String orderPeriodStr = getString_UrlDecode_UTF8("orderPeriod"); // 订单有效期
+		paramMap.put("orderPeriod", orderPeriodStr);
+		String returnUrl = getString_UrlDecode_UTF8("returnUrl"); // 页面通知返回url
+		paramMap.put("returnUrl", returnUrl);
+		String notifyUrl = getString_UrlDecode_UTF8("notifyUrl"); // 后台消息通知Url
+		paramMap.put("notifyUrl", notifyUrl);
+		String remark = getString_UrlDecode_UTF8("remark"); // 支付备注
+		paramMap.put("remark", remark);
+		String sign = getString_UrlDecode_UTF8("sign"); // 签名
 
-        String field1 = getString_UrlDecode_UTF8("field1"); // 扩展字段1
-        paramMap.put("field1",field1);
-        String field2 = getString_UrlDecode_UTF8("field2"); // 扩展字段2
-        paramMap.put("field2",field2);
-        String field3 = getString_UrlDecode_UTF8("field3"); // 扩展字段3
-        paramMap.put("field3",field3);
-        String field4 = getString_UrlDecode_UTF8("field4"); // 扩展字段4
-        paramMap.put("field4",field4);
-        String field5 = getString_UrlDecode_UTF8("field5"); // 扩展字段5
-        paramMap.put("field5",field5);
+		String field1 = getString_UrlDecode_UTF8("field1"); // 扩展字段1
+		paramMap.put("field1", field1);
+		String field2 = getString_UrlDecode_UTF8("field2"); // 扩展字段2
+		paramMap.put("field2", field2);
+		String field3 = getString_UrlDecode_UTF8("field3"); // 扩展字段3
+		paramMap.put("field3", field3);
+		String field4 = getString_UrlDecode_UTF8("field4"); // 扩展字段4
+		paramMap.put("field4", field4);
+		String field5 = getString_UrlDecode_UTF8("field5"); // 扩展字段5
+		paramMap.put("field5", field5);
 
-        Date orderDate = DateUtils.parseDate(orderDateStr,"yyyyMMdd");
-        Date orderTime = DateUtils.parseDate(orderTimeStr,"yyyyMMddHHmmss");
-        Integer orderPeriod = Integer.valueOf(orderPeriodStr);
+		Date orderDate = DateUtils.parseDate(orderDateStr, "yyyyMMdd");
+		Date orderTime = DateUtils.parseDate(orderTimeStr, "yyyyMMddHHmmss");
+		Integer orderPeriod = Integer.valueOf(orderPeriodStr);
 
         RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
         if (rpUserPayConfig == null){
@@ -146,19 +147,18 @@ public class ScanPayController extends BaseController {
 			logger.error("订单签名异常:" + paramMap.toString());
 			throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR, "订单签名异常");
 		}
-
+		BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
+		
+		OrderPayBo orderPayBo = changToOrderBo(productName, orderNo, orderDate, orderTime, orderPrice, 
+	    	 orderIp, orderPeriod, returnUrl, notifyUrl, remark, 
+	    	 field1, field2, field3, field4, field5);
 		if (StringUtil.isEmpty(payWayCode)) {// 非直连方式
-            BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
-            RpPayGateWayPageShowVo payGateWayPageShowVo = rpTradePaymentManagerService
-            		.initNonDirectScanPay(payKey, productName, orderNo, orderDate, orderTime, orderPrice, 
-            		orderIp, orderPeriod, returnUrl, notifyUrl, remark, field1, field2, field3, field4, field5);
+            
+            RpPayGateWayPageShowVo payGateWayPageShowVo = rpTradePaymentManagerService.initNonDirectScanPay(payKey, orderPayBo);
             model.addAttribute("payGateWayPageShowVo",payGateWayPageShowVo);//支付网关展示数据
             return "gateway";
 		} else { // 直连方式
-            BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
-            ScanPayResultVo scanPayResultVo = rpTradePaymentManagerService.initDirectScanPay(payKey, productName, 
-            		orderNo, orderDate, orderTime, orderPrice, payWayCode, orderIp, orderPeriod, returnUrl, 
-            		notifyUrl, remark, field1, field2, field3, field4, field5);
+            ScanPayResultVo scanPayResultVo = rpTradePaymentManagerService.initDirectScanPay(payKey, payWayCode, orderPayBo);
             model.addAttribute("codeUrl",scanPayResultVo.getCodeUrl());//支付二维码
 			if (PayWayEnum.WEIXIN.name().equals(scanPayResultVo.getPayWayCode())) {
 				String orderQueryUrl =  PropertyConfigurer.getString("weixinpay.order_query_url") 

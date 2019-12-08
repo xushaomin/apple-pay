@@ -19,6 +19,7 @@ import com.appleframework.pay.common.core.utils.DateUtils;
 import com.appleframework.pay.controller.common.BaseController;
 import com.appleframework.pay.service.CnpPayService;
 import com.appleframework.pay.trade.exception.TradeBizException;
+import com.appleframework.pay.trade.model.OrderPayBo;
 import com.appleframework.pay.trade.service.RpTradePaymentManagerService;
 import com.appleframework.pay.trade.utils.MerchantApiUtil;
 import com.appleframework.pay.trade.vo.F2FPayResultVo;
@@ -106,7 +107,12 @@ public class F2FPayController extends BaseController {
         }
 
         BigDecimal orderPrice = BigDecimal.valueOf(Double.valueOf(orderPriceStr));
-        F2FPayResultVo f2FPayResultVo = rpTradePaymentManagerService.f2fPay(payKey, authCode, productName, orderNo, orderDate, orderTime, orderPrice, payWayCode, orderIp, remark, field1, field2, field3, field4, field5);
+        
+		OrderPayBo orderPayBo = changToOrderBo(productName, orderNo, orderDate, orderTime, orderPrice, 
+		    	 orderIp, null, null, null, remark, 
+		    	 field1, field2, field3, field4, field5);
+
+        F2FPayResultVo f2FPayResultVo = rpTradePaymentManagerService.f2fPay(payKey, authCode, payWayCode, orderPayBo);
 
         String payResultJson = JSONObject.toJSONString(f2FPayResultVo);
 

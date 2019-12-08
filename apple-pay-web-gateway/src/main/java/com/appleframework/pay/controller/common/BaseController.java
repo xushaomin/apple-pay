@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
+import java.util.Date;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.appleframework.pay.common.core.utils.StringUtil;
+import com.appleframework.pay.trade.model.OrderPayBo;
 
 
 /**
@@ -252,5 +254,28 @@ public abstract class BaseController {
         } finally {
             out.close();
         }
+    }
+    
+    public OrderPayBo changToOrderBo(String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice, 
+    		String orderIp, Integer orderPeriod, String returnUrl, String notifyUrl, String remark, 
+    		String field1, String field2, String field3, String field4, String field5) {
+    	OrderPayBo orderPay = new OrderPayBo();
+    	orderPay.setField1(field1);
+    	orderPay.setField2(field2);
+    	orderPay.setField3(field3);
+    	orderPay.setField4(field4);
+    	orderPay.setField5(field5);
+    	orderPay.setNotifyUrl(notifyUrl);
+    	orderPay.setReturnUrl(returnUrl);
+    	orderPay.setOrderDate(orderDate);
+    	orderPay.setOrderIp(orderIp);
+    	orderPay.setOrderNo(orderNo);
+    	orderPay.setOrderPeriod(orderPeriod);
+    	orderPay.setOrderPrice(orderPrice);
+    	orderPay.setOrderTime(orderTime);
+    	orderPay.setProductName(productName);
+    	orderPay.setRemark(remark);
+    	return orderPay;
+    	
     }
 }

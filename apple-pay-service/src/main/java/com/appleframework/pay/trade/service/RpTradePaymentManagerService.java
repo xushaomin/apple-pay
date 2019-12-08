@@ -15,14 +15,13 @@
  */
 package com.appleframework.pay.trade.service;
 
+import com.appleframework.pay.trade.model.OrderPayBo;
 import com.appleframework.pay.trade.vo.AppPayResultVo;
 import com.appleframework.pay.trade.vo.F2FPayResultVo;
 import com.appleframework.pay.trade.vo.OrderPayResultVo;
 import com.appleframework.pay.trade.vo.RpPayGateWayPageShowVo;
 import com.appleframework.pay.trade.vo.ScanPayResultVo;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -57,8 +56,7 @@ public interface RpTradePaymentManagerService {
      * @param field4    扩展字段4
      * @param field5    扩展字段5
      */
-    public ScanPayResultVo initDirectScanPay(String payKey, String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice, String payWayCode, String orderIp, Integer orderPeriod, String returnUrl
-            , String notifyUrl, String remark, String field1, String field2, String field3, String field4, String field5);
+    public ScanPayResultVo initDirectScanPay(String payKey, String payWayCode, OrderPayBo bo);
 
 
     /**
@@ -86,8 +84,35 @@ public interface RpTradePaymentManagerService {
      * @param field4    扩展字段4
      * @param field5    扩展字段5
      */
-    public AppPayResultVo initDirectAppPay(String payKey, String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice, String payWayCode, String orderIp, Integer orderPeriod, String returnUrl
-            , String notifyUrl, String remark, String field1, String field2, String field3, String field4, String field5);
+    public AppPayResultVo initDirectAppPay(String payKey, String payWayCode, OrderPayBo bo);
+    
+    /**
+     * 初始化直连APP支付数据,直连扫码支付初始化方法规则
+     * 1:根据(商户编号 + 商户订单号)确定订单是否存在
+     * 1.1:如果订单不存在,创建支付订单
+     * 2:创建支付记录
+     * 3:根据相应渠道方法
+     * 4:调转到相应支付渠道扫码界面
+     * @param payKey    商户支付Key
+     * @param productName   产品名称
+     * @param orderNo   商户订单号
+     * @param orderDate 下单日期
+     * @param orderTime 下单时间
+     * @param orderPrice    订单金额(元)
+     * @param payWayCode    支付方式
+     * @param orderIp   下单IP
+     * @param orderPeriod   订单有效期(分钟)
+     * @param returnUrl 支付结果页面通知地址
+     * @param notifyUrl 支付结果后台通知地址
+     * @param remark    支付备注
+     * @param field1    扩展字段1
+     * @param field2    扩展字段2
+     * @param field3    扩展字段3
+     * @param field4    扩展字段4
+     * @param field5    扩展字段5
+     */
+    public AppPayResultVo initDirectJsapiPay(String payKey, String payWayCode, OrderPayBo bo);
+
 
     /**
      * 条码支付,对应的是支付宝的条码支付或者微信的刷卡支付
@@ -108,7 +133,7 @@ public interface RpTradePaymentManagerService {
      * @param field5    扩展字段5
      * @return
      */
-    public F2FPayResultVo f2fPay(String payKey,String authCode ,  String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice, String payWayCode, String orderIp,  String remark, String field1, String field2, String field3, String field4, String field5);
+    public F2FPayResultVo f2fPay(String payKey,String authCode, String payWayCode, OrderPayBo bo);
     /**
      * 完成扫码支付(支付宝即时到账支付)
      * @param payWayCode
@@ -147,8 +172,7 @@ public interface RpTradePaymentManagerService {
      * @param field4    扩展字段4
      * @param field5    扩展字段5
      */
-    public RpPayGateWayPageShowVo initNonDirectScanPay(String payKey, String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice, String orderIp, Integer orderPeriod, String returnUrl
-            , String notifyUrl, String remark, String field1, String field2, String field3, String field4, String field5);
+    public RpPayGateWayPageShowVo initNonDirectScanPay(String payKey, OrderPayBo bo);
 
 
     /**
