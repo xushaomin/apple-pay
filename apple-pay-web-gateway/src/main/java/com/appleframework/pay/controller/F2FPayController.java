@@ -91,6 +91,9 @@ public class F2FPayController extends BaseController {
         paramMap.put("field4", field4);
         String field5 = getString_UrlDecode_UTF8("field5"); // 扩展字段5
         paramMap.put("field5", field5);
+        
+        String subMerchantNo = getString_UrlDecode_UTF8("subMerchantNo"); // 扩展字段5
+        paramMap.put("subMerchantNo", subMerchantNo);
 
         Date orderDate = DateUtils.parseDate(orderDateStr, "yyyyMMdd");
         Date orderTime = DateUtils.parseDate(orderTimeStr, "yyyyMMddHHmmss");
@@ -110,7 +113,7 @@ public class F2FPayController extends BaseController {
         
 		OrderPayBo orderPayBo = changToOrderBo(productName, orderNo, orderDate, orderTime, orderPrice, 
 		    	 orderIp, null, null, null, remark, 
-		    	 field1, field2, field3, field4, field5);
+		    	 field1, field2, field3, field4, field5, subMerchantNo);
 
         F2FPayResultVo f2FPayResultVo = rpTradePaymentManagerService.f2fPay(payKey, authCode, payWayCode, orderPayBo);
 

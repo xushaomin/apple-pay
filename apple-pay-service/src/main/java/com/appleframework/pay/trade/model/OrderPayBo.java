@@ -22,6 +22,7 @@ public class OrderPayBo {
 	private String notifyUrl;
 	
 	private String remark;
+	private String subMerchantNo;
 
 	public String getField1() {
 		return field1;
@@ -141,6 +142,14 @@ public class OrderPayBo {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getSubMerchantNo() {
+		return subMerchantNo;
+	}
+
+	public void setSubMerchantNo(String subMerchantNo) {
+		this.subMerchantNo = subMerchantNo;
 	}
 
 }

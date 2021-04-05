@@ -92,13 +92,13 @@
 			<dependency>
 			  	<groupId>com.appleframework.boot</groupId>
 			  	<artifactId>apple-boot-spring</artifactId>
-			  	<version>0.3.0.RELEASE</version>
+			  	<version>0.3.7.RELEASE</version>
 			</dependency>
 			
 			<dependency>
 			  	<groupId>com.appleframework.boot</groupId>
-			  	<artifactId>apple-boot-jetty</artifactId>
-			  	<version>0.3.0.RELEASE</version>
+			  	<artifactId>apple-boot-tomcat8</artifactId>
+			  	<version>0.3.7.RELEASE</version>
 			</dependency>
 			
 			<dependency>

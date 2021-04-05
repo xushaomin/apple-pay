@@ -258,7 +258,7 @@ public abstract class BaseController {
     
     public OrderPayBo changToOrderBo(String productName, String orderNo, Date orderDate, Date orderTime, BigDecimal orderPrice, 
     		String orderIp, Integer orderPeriod, String returnUrl, String notifyUrl, String remark, 
-    		String field1, String field2, String field3, String field4, String field5) {
+    		String field1, String field2, String field3, String field4, String field5, String subMerchantNo) {
     	OrderPayBo orderPay = new OrderPayBo();
     	orderPay.setField1(field1);
     	orderPay.setField2(field2);
@@ -275,6 +275,7 @@ public abstract class BaseController {
     	orderPay.setOrderTime(orderTime);
     	orderPay.setProductName(productName);
     	orderPay.setRemark(remark);
+    	orderPay.setSubMerchantNo(subMerchantNo);
     	return orderPay;
     	
     }

@@ -169,7 +169,7 @@ public class RpTradePaymentRecord extends BaseEntity implements Serializable {
 
     /** 扩展字段5 **/
     private String field5;
-
+    
     public String getProductName() {
         return productName;
     }
@@ -507,6 +507,7 @@ public class RpTradePaymentRecord extends BaseEntity implements Serializable {
     public void setField5(String field5) {
         this.field5 = field5 == null ? null : field5.trim();
     }
+    
 
     public Integer getRefundTimes() {
         return refundTimes;

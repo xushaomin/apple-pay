@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.domain.ExtendParams;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.appleframework.config.core.PropertyConfigurer;
@@ -46,6 +48,7 @@ import com.appleframework.pay.trade.dao.RpTradePaymentRecordDao;
 import com.appleframework.pay.trade.entity.GoodsDetails;
 import com.appleframework.pay.trade.entity.RpTradePaymentOrder;
 import com.appleframework.pay.trade.entity.RpTradePaymentRecord;
+import com.appleframework.pay.trade.entity.RpUserPayOauth;
 import com.appleframework.pay.trade.entity.weixinpay.WeiXinPrePay;
 import com.appleframework.pay.trade.enums.OrderFromEnum;
 import com.appleframework.pay.trade.enums.TradeStatusEnum;
@@ -56,6 +59,7 @@ import com.appleframework.pay.trade.enums.weixinpay.WeixinTradeStateEnum;
 import com.appleframework.pay.trade.exception.TradeBizException;
 import com.appleframework.pay.trade.model.OrderPayBo;
 import com.appleframework.pay.trade.service.RpTradePaymentManagerService;
+import com.appleframework.pay.trade.service.RpUserPayOauthService;
 import com.appleframework.pay.trade.utils.MerchantApiUtil;
 import com.appleframework.pay.trade.utils.WeiXinPayUtils;
 import com.appleframework.pay.trade.utils.alipay.config.AlipayConfigUtil;
@@ -124,6 +128,9 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
     @Autowired
     private AliF2FPaySubmit aliF2FPaySubmit;
+    
+	@Autowired
+	private RpUserPayOauthService rpUserPayOauthService;
 
     /**
      * 初始化直连扫码支付数据,直连扫码支付初始化方法规则
@@ -1055,7 +1062,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		} else if (PayWayEnum.ALIPAY.name().equals(payWayCode)) {
 			// 支付宝支付
 			String app_id = "";
-			String seller_id = "";
+			String merchant_id = "";
 			String rsa_private_key = "";
 			String alipay_public_key = "";
 
@@ -1063,12 +1070,12 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				// 根据资金流向获取配置信息
 				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(), payWayCode);
 				app_id = rpUserPayInfo.getAppId();
-				seller_id = rpUserPayInfo.getMerchantId();
+				merchant_id = rpUserPayInfo.getMerchantId();
 				rsa_private_key = rpUserPayInfo.getRsaPrivateKey();
 				alipay_public_key = rpUserPayInfo.getRsaPublicKey();
 			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())) {// 平台收款
 				app_id = AlipayConfigUtil.app_id;
-				seller_id = AlipayConfigUtil.seller_id;
+				merchant_id = AlipayConfigUtil.seller_id;
 				rsa_private_key = AlipayConfigUtil.rsa_private_key;
 				alipay_public_key = AlipayConfigUtil.rsa_public_key;
 			}
@@ -1079,6 +1086,16 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 
 			AlipayClient alipayClient = new 
 					DefaultAlipayClient(serverUrl, app_id, rsa_private_key, "json", charset, alipay_public_key, "RSA2");
+			
+			String prePayMessage = null;
+			String seller_id = merchant_id;
+
+			String subMerchantId = bo.getSubMerchantNo();
+			
+			if(null != subMerchantId) {
+				seller_id = subMerchantId.trim();
+			}
+			
 			AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
 			AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
 			// model.setBody("我是测试数据");
@@ -1090,8 +1107,24 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			model.setProductCode("QUICK_MSECURITY_PAY");
 			request.setBizModel(model);
 			request.setNotifyUrl(AlipayConfigUtil.notify_url);
+			
+			if(null != subMerchantId) {
+				RpUserPayOauth oauth = rpUserPayOauthService.getOne("ALIPAY", app_id, merchant_id, seller_id);
+				if (null != oauth) {
+					ExtendParams extendParams = new ExtendParams();
+					extendParams.setSysServiceProviderId(merchant_id.trim());
+					model.setExtendParams(extendParams);
 
-			String prePayMessage = null;
+					// 获取授权token
+					String authToken = oauth.getAuthToken();
+					if (StringUtils.isEmpty(authToken)) {
+						LOG.error("alipay_支付宝获取authToken失败，sellerId=" + bo.getSubMerchantNo());
+						return null;
+					}
+					request.putOtherTextParam("app_auth_token", authToken.trim());
+				}
+			}
+
 			try {
 				AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
 				if(response.isSuccess()){

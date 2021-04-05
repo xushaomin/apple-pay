@@ -28,7 +28,7 @@
 		<!-- apple -->
 		<dependency>
 			<groupId>com.appleframework.boot</groupId>
-			<artifactId>apple-boot-jetty</artifactId>
+			<artifactId>apple-boot-tomcat8</artifactId>
 		</dependency>
 		
 		<dependency>
