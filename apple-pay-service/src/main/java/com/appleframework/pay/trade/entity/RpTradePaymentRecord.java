@@ -170,6 +170,8 @@ public class RpTradePaymentRecord extends BaseEntity implements Serializable {
     /** 扩展字段5 **/
     private String field5;
     
+    private String subMerchantNo;
+    
     public String getProductName() {
         return productName;
     }
@@ -549,7 +551,15 @@ public class RpTradePaymentRecord extends BaseEntity implements Serializable {
     	return DateUtils.formatDate(this.getCreateTime(), "yyyy-MM-dd HH:mm");
     }
 
-    @Override
+    public String getSubMerchantNo() {
+		return subMerchantNo;
+	}
+
+	public void setSubMerchantNo(String subMerchantNo) {
+		this.subMerchantNo = subMerchantNo;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());

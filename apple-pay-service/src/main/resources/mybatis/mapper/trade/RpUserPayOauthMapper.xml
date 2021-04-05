@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.appleframework.pay.trade.dao.impl.RpUserPayOauthDaoImpl" >
+  <resultMap id="BaseResultMap" type="com.appleframework.pay.trade.entity.RpUserPayOauth" >
+    <id column="id_" property="id" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="edit_time" property="editTime" jdbcType="TIMESTAMP" />
+  	<result column="editor" property="editor" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    
+    <result column="app_id" property="appId" jdbcType="VARCHAR" />
+    <result column="app_type" property="appType" jdbcType="VARCHAR" />
+    <result column="merchant_id" property="merchantId" jdbcType="VARCHAR" />
+    <result column="user_no" property="userNo" jdbcType="VARCHAR" />
+    
+    <result column="auth_token" property="authToken" jdbcType="VARCHAR" />
+    <result column="refresh_token" property="refreshToken" jdbcType="VARCHAR" />
+    <result column="expires_in" property="expiresIn" jdbcType="INTEGER" />
+    <result column="re_expires_in" property="reExpiresIn" jdbcType="INTEGER" />
+    
+ 	<result column="pay_userid" property="payUserid" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id_, create_time, edit_time, version, remark, status, editor, creater,
+    app_id, app_type, merchant_id, user_no,
+    auth_token, refresh_token, expires_in, re_expires_in
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from rp_user_pay_oauth
+    where id_ = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from rp_user_pay_oauth
+    where id_ = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.appleframework.pay.trade.entity.RpUserPayOauth" >
+    insert into rp_user_pay_oauth (
+      id_, create_time, edit_time, version, remark, status, editor, creater,
+      app_id, app_type, merchant_id, user_no,
+      auth_token, refresh_token, expires_in, re_expires_in,
+      pay_userid
+    )
+    values (
+      #{id,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, 
+      #{editTime,jdbcType=TIMESTAMP}, 
+      #{version,jdbcType=BIGINT}, 
+      #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, 
+      #{editor,jdbcType=VARCHAR}, 
+      #{creater,jdbcType=VARCHAR},
+      
+      #{appId,jdbcType=VARCHAR}, 
+      #{appType,jdbcType=VARCHAR}, 
+      #{merchantId,jdbcType=VARCHAR}, 
+      #{userNo,jdbcType=VARCHAR}, 
+      
+      #{authToken,jdbcType=VARCHAR}, 
+      #{refreshToken,jdbcType=VARCHAR}, 
+      #{expiresIn,jdbcType=INTEGER}, 
+      #{reExpiresIn,jdbcType=INTEGER},
+      
+      #{payUserid,jdbcType=INTEGER}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.appleframework.pay.trade.entity.RpUserPayOauth" >
+    update rp_user_pay_oauth
+    set 
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      edit_time = #{editTime,jdbcType=TIMESTAMP},
+      version = #{version,jdbcType=BIGINT},
+      remark = #{remark,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      editor = #{editor,jdbcType=VARCHAR},
+      creater = #{creater,jdbcType=VARCHAR},
+      
+      app_id = #{appId,jdbcType=VARCHAR},
+   	  app_type = #{appType,jdbcType=VARCHAR},
+	  merchant_id = #{merchantId,jdbcType=VARCHAR},
+      user_no = #{userNo,jdbcType=VARCHAR},
+      
+      auth_token = #{authToken,jdbcType=VARCHAR},
+      refresh_token = #{refreshToken,jdbcType=VARCHAR},
+      expires_in = #{expiresIn,jdbcType=VARCHAR},
+      re_expires_in = #{reExpiresIn,jdbcType=VARCHAR},
+  	  pay_userid = #{payUserid,jdbcType=VARCHAR}
+      
+    where id_ = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <sql id="table_name">  rp_user_pay_oauth </sql>
+  
+  <!-- 根据搜索条件获取数据 -->
+  <sql id="condition_sql">
+    <if test="appType != null and appType != ''" >
+        and app_type = #{appType,jdbcType=VARCHAR}
+    </if>
+    <if test="appId != null and appId != ''" >
+        and app_id = #{appId,jdbcType=VARCHAR}
+    </if>
+    <if test="merchantId != null and merchantId != ''" >
+        and merchant_id = #{merchantId,jdbcType=VARCHAR}
+    </if>
+    <if test="payUserid != null and payUserid != ''" >
+        and pay_userid = #{payUserid,jdbcType=VARCHAR}
+    </if>
+  </sql>
+
+  <select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select * from
+    <include refid="table_name" />
+    <where>
+      <include refid="condition_sql" />
+    </where>
+    order by create_time desc
+  </select>
+  
+  	<!-- 分页查询 -->
+	<select id="listPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select * from
+		<include refid="table_name" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		order by create_time desc limit #{pageFirst}, #{pageSize}
+	</select>
+
+	<!-- 分页查询时要用到的总数统计 -->
+	<select id="listPageCount" parameterType="java.util.Map"
+		resultType="java.lang.Long">
+		select count(1) from
+		<include refid="table_name" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+	
+	<select id="listByColumn" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from rp_user_pay_oauth
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+	
+</mapper>

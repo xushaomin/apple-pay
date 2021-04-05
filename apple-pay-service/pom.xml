@@ -66,6 +66,12 @@
 			<groupId>com.appleframework.pay</groupId>
 			<artifactId>alipay-trade-sdk</artifactId>
 		</dependency>
+		
+		<dependency>
+		  	<groupId>com.egzosn</groupId>
+		  	<artifactId>pay-java-wx</artifactId>
+		  	<version>2.14.1-b</version>
+		</dependency>
 						
 	</dependencies>
 

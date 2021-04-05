@@ -123,6 +123,8 @@ public class RpTradePaymentOrder extends BaseEntity implements Serializable {
 
     /** 扩展字段5 **/
     private String field5;
+    
+    private String subMerchantNo;
 
     public String getProductName() {
         return productName;
@@ -372,7 +374,15 @@ public class RpTradePaymentOrder extends BaseEntity implements Serializable {
         this.field5 = field5 == null ? null : field5.trim();
     }
 
-    @Override
+    public String getSubMerchantNo() {
+		return subMerchantNo;
+	}
+
+	public void setSubMerchantNo(String subMerchantNo) {
+		this.subMerchantNo = subMerchantNo;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());

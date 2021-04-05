@@ -12,7 +12,6 @@ DEPLOY_DIR=`pwd`
 CONF_DIR=$DEPLOY_DIR/conf
 
 SERVER_NAME=`sed '/application.name/!d;s/.*=//' conf/system.properties | tr -d '\r'`
-SERVER_PROTOCOL=`sed '/protocol.name/!d;s/.*=//' conf/system.properties | tr -d '\r'`
 SERVER_PORT=`sed '/web.port/!d;s/.*=//' conf/system.properties | tr -d '\r'`
 LOGS_FILE=`sed '/log4j.appender.logToFile.File/!d;s/.*=//' conf/log4j.properties | tr -d '\r'`
 JMX_PORT=`sed '/jmx.port/!d;s/.*=//' conf/system.properties | tr -d '\r'`
@@ -92,11 +91,7 @@ while [ $COUNT -lt 1 ]; do
     echo -e ".\c"
     sleep 1 
     if [ -n "$SERVER_PORT" ]; then
-        if [ "$SERVER_PROTOCOL" == "dubbo" ]; then
-    	    COUNT=`echo status | nc -i 1 127.0.0.1 $SERVER_PORT | grep -c OK`
-        else
-            COUNT=`netstat -an | grep "\b$SERVER_PORT\b" | wc -l`
-        fi
+        COUNT=`netstat -an | grep "\b$SERVER_PORT\b" | wc -l`
     else
     	COUNT=`ps -f | grep java | grep "$DEPLOY_DIR" | awk '{print $2}' | wc -l`
     fi

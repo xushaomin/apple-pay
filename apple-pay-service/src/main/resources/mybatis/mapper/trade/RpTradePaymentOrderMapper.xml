@@ -40,6 +40,8 @@
     <result column="field3" property="field3" jdbcType="VARCHAR" />
     <result column="field4" property="field4" jdbcType="VARCHAR" />
     <result column="field5" property="field5" jdbcType="VARCHAR" />
+    
+    <result column="sub_merchant_no" property="subMerchantNo" jdbcType="VARCHAR" />
   </resultMap>
 
   <sql id="Base_Column_List" >
@@ -48,7 +50,7 @@
     order_referer_url, return_url, notify_url, cancel_reason, order_period, expire_time, 
     pay_way_code, pay_way_name, remark, trx_type, pay_type_code, pay_type_name, fund_into_type, 
     is_refund, refund_times, success_refund_amount,trx_no, field1, field2, field3, field4,
-    field5
+    field5, sub_merchant_no
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -108,8 +110,7 @@
       remark, trx_type, pay_type_code, 
       pay_type_name, fund_into_type, is_refund, 
       refund_times, success_refund_amount, trx_no , field1,
-      field2, field3, field4, 
-      field5)
+      field2, field3, field4, field5, sub_merchant_no)
     values (#{id,jdbcType=VARCHAR}, #{version,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP}, 
       #{editor,jdbcType=VARCHAR}, #{creater,jdbcType=VARCHAR}, #{editTime,jdbcType=TIMESTAMP}, 
       #{status,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{merchantOrderNo,jdbcType=VARCHAR}, 
@@ -122,7 +123,7 @@
       #{payTypeName,jdbcType=VARCHAR}, #{fundIntoType,jdbcType=VARCHAR}, #{isRefund,jdbcType=VARCHAR}, 
       #{refundTimes,jdbcType=SMALLINT}, #{successRefundAmount,jdbcType=DECIMAL}, #{trxNo,jdbcType=VARCHAR}, #{field1,jdbcType=VARCHAR},
       #{field2,jdbcType=VARCHAR}, #{field3,jdbcType=VARCHAR}, #{field4,jdbcType=VARCHAR}, 
-      #{field5,jdbcType=VARCHAR})
+      #{field5,jdbcType=VARCHAR},#{subMerchantNo,jdbcType=VARCHAR})
   </insert>
 
   <update id="updateByPrimaryKey" parameterType="com.appleframework.pay.trade.entity.RpTradePaymentOrder" >
@@ -163,7 +164,8 @@
       field2 = #{field2,jdbcType=VARCHAR},
       field3 = #{field3,jdbcType=VARCHAR},
       field4 = #{field4,jdbcType=VARCHAR},
-      field5 = #{field5,jdbcType=VARCHAR}
+      field5 = #{field5,jdbcType=VARCHAR},
+      sub_merchant_no = #{subMerchantNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
