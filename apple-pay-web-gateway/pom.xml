@@ -60,6 +60,12 @@
     		<artifactId>jackson-mapper-asl</artifactId>
     		<version>1.9.13</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>net.oschina.durcframework</groupId>
+    		<artifactId>easyopen</artifactId>
+    		<version>1.16.10.APPLE</version>
+		</dependency>
 
     </dependencies>
 
