@@ -35,9 +35,11 @@ import com.appleframework.pay.trade.vo.AppPayResultVo;
 import com.appleframework.pay.user.entity.RpUserPayConfig;
 import com.appleframework.pay.user.exception.UserBizException;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
+import com.gitee.easyopen.ApiContext;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
+import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 
 /**
  * <b>功能说明:扫码支付控制类
@@ -65,12 +67,13 @@ public class JsapiPayApi extends BaseController {
      * 2:未传入支付通道参数,跳转到
      * @return
      */
-	@Api(name = "/jsapiPay/jsonPay", isIgnoreToken = true)
+	@Api(name = "pay.jsapi", isIgnoreToken = true)
+	@ApiDocMethod(description = "JSAPI支付")
     public @ResponseBody Object jsonPay(JsapiJsonPayRequest request){
         Map<String , Object> paramMap = new HashMap<String , Object>();
 
         //获取商户传入参数
-        String payKey = request.getPayKey(); // 企业支付KEY
+        
         String productName = request.getProductName(); // 商品名称
         String orderNo = request.getOrderNo(); // 订单编号
         String orderPriceStr = request.getOrderPrice(); // 订单金额 , 单位:元
@@ -96,6 +99,8 @@ public class JsapiPayApi extends BaseController {
 		Integer orderPeriod = Integer.valueOf(orderPeriodStr);
         
 		LOG.info("PAY请求参数:" + JSON.toJSONString(paramMap));
+		
+		String payKey = ApiContext.getApiParam().fatchAppKey();
         
 		RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
 		if (rpUserPayConfig == null) {

@@ -4,9 +4,6 @@ import com.gitee.easyopen.doc.annotation.ApiDocField;
 
 public class JsapiJsonPayRequest {
 
-	@ApiDocField(name = "payKey", description = "企业支付KEY", example = "delangjuhe")
-	private String payKey;
-
 	@ApiDocField(name = "productName", description = "商品名称", example = "嘚啷")
 	private String productName;
 
@@ -34,10 +31,10 @@ public class JsapiJsonPayRequest {
 	@ApiDocField(name = "returnUrl", description = "页面通知返回url", example = "http://www.leyye.com")
 	private String returnUrl;
 
-	@ApiDocField(name = "orderIp", description = "后台消息通知Url", example = "http://114.55.105.126:8002/pay/callback")
+	@ApiDocField(name = "notifyUrl", description = "后台消息通知Url", example = "http://114.55.105.126:8002/pay/callback")
 	private String notifyUrl;
 
-	@ApiDocField(name = "orderIp", description = "支付备注", example = "test")
+	@ApiDocField(name = "remark", description = "支付备注", example = "test")
 	private String remark;
 
 	@ApiDocField(name = "field1", description = "扩展字段1", example = "1")
@@ -57,14 +54,6 @@ public class JsapiJsonPayRequest {
 
 	@ApiDocField(name = "subMerchantNo", description = "子商户号", example = "1607855620")
 	private String subMerchantNo;
-
-	public String getPayKey() {
-		return payKey;
-	}
-
-	public void setPayKey(String payKey) {
-		this.payKey = payKey;
-	}
 
 	public String getProductName() {
 		return productName;

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.appleframework.pay.user.exception.UserBizException;
 import com.gitee.easyopen.ApiConfig;
-import com.gitee.easyopen.auth.Oauth2Manager;
+import com.gitee.easyopen.AppSecretManager;
+import com.gitee.easyopen.Signer;
 import com.gitee.easyopen.support.ApiController;
 
 /**
@@ -21,7 +22,10 @@ import com.gitee.easyopen.support.ApiController;
 public class IndexController extends ApiController {
 	
 	@Resource
-	private Oauth2Manager oauth2Manager;
+	private AppSecretManager appSecretManager;
+	
+	//@Resource
+	//private Signer signer;
 	
     @Override
     protected void initApiConfig(ApiConfig apiConfig) {
@@ -30,15 +34,19 @@ public class IndexController extends ApiController {
         Map<String, String> appSecretStore = new HashMap<String, String>();
         appSecretStore.put("test", "123456");
         apiConfig.addAppSecret(appSecretStore);
-        apiConfig.setApiName("method");
-        apiConfig.setAppKeyName("appkey");
+        apiConfig.setApiName("name");
+        apiConfig.setAppKeyName("payKey");
         apiConfig.setSignName("sign");
-        apiConfig.setVersionName("v");
+        //apiConfig.setVersionName("v");
         apiConfig.setTraceId("traceId");
-        apiConfig.setIgnoreValidate(true);
+        apiConfig.setIgnoreValidate(false);
         apiConfig.setStandardMode(false);
+        apiConfig.setShowDoc(true);
         apiConfig.setServiceExceptionClass(UserBizException.class);
-        apiConfig.setOauth2Manager(oauth2Manager);
+        
+        apiConfig.setAppSecretManager(appSecretManager);
+        apiConfig.setTimeoutSeconds(0);
+        //apiConfig.setSigner(signer);
         
         //apiConfig.setInterceptors(new ApiInterceptor[]{new UrlApiInterceptor()});
         

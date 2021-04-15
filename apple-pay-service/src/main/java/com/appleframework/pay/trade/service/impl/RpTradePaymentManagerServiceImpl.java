@@ -969,7 +969,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
     	
     	orderPay.setProductName(rpTradePaymentOrder.getProductName());
     	orderPay.setRemark(rpTradePaymentOrder.getRemark());
-    	
+    	orderPay.setSubMerchantNo(rpTradePaymentOrder.getSubMerchantNo());
     	return orderPay;
     }
     
@@ -1026,13 +1026,23 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				WxPayConfigStorage wxPayConfigStorage = new WxPayConfigStorage();
 				wxPayConfigStorage.setMchId(mch_id);
 				wxPayConfigStorage.setAppId(appid);
-				wxPayConfigStorage.setSubMchId(subMerchantId);
 				//wxPayConfigStorage.setKeyPublic("转账公钥，转账时必填");
-				wxPayConfigStorage.setSecretKey(partnerKey);
+				//wxPayConfigStorage.setSecretKey(partnerKey);
+				wxPayConfigStorage.setKeyPrivate(partnerKey);
 				wxPayConfigStorage.setNotifyUrl(PropertyConfigurer.getString("weixinpay.notify_url"));
 				wxPayConfigStorage.setReturnUrl(PropertyConfigurer.getString("weixinpay.notify_url"));
-				wxPayConfigStorage.setSignType("md5");
+				wxPayConfigStorage.setSignType("MD5");
 				wxPayConfigStorage.setInputCharset("utf-8");
+				
+				RpUserPayInfo subUserPayInfo = rpUserPayInfoService.getByUserNo(subMerchantId, payWayCode);
+				if(null != subUserPayInfo) {
+					if(null != subUserPayInfo.getMerchantId()) {
+						wxPayConfigStorage.setSubMchId(subUserPayInfo.getMerchantId());
+					}
+					if(null != subUserPayInfo.getAppId()) {
+						wxPayConfigStorage.setSubAppid(subUserPayInfo.getAppId());
+					}
+				}
 				
 		        //支付服务
 		        PayService service =  new WxPayService(wxPayConfigStorage);
@@ -1043,24 +1053,29 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 				//String subject, String body, BigDecimal price, String outTradeNo
 				PayOrder payOrder = new PayOrder(rpTradePaymentOrder.getProductName(), 
 						rpTradePaymentOrder.getRemark(), totalFee, rpTradePaymentRecord.getBankOrderNo());
+				
+				payOrder.addAttr("profit_sharing", "Y");
+
+				appPayResultVo.setPayWayCode(PayWayEnum.WEIXIN.name());
+                appPayResultVo.setProductName(rpTradePaymentOrder.getProductName());
+                appPayResultVo.setOrderAmount(rpTradePaymentOrder.getOrderAmount());
 
 				if(payType.name().equals(PayTypeEnum.WX_PROGRAM_PAY.name())) {
 			        //公众号支付
 			        payOrder.setTransactionType(WxTransactionType.JSAPI);
 			        //微信公众号对应微信付款用户的唯一标识
 			        payOrder.setOpenid(rpTradePaymentOrder.getField5());
-			        Map<String, Object> appOrderInfo = service.orderInfo(payOrder);
-			        System.out.println(appOrderInfo);
-			          
+			        Map<String, String> prePay = service.orderInfo(payOrder);
+			        System.out.println(prePay);
+			        appPayResultVo.setPrePay(prePay);
                 }
                 else {
                     payOrder.setTransactionType(WxTransactionType.APP);
                     //获取APP支付所需的信息组，直接给app端就可使用
-                    Map<String, Object> appOrderInfo = service.orderInfo(payOrder);
-                    System.out.println(appOrderInfo);
+                    Map<String, String> prePay = service.orderInfo(payOrder);
+                    System.out.println(prePay);
+                    appPayResultVo.setPrePay(prePay);
                 }
-				
-
 			} else {
 				WeiXinTradeTypeEnum wxTradeType = WeiXinTradeTypeEnum.APP;
 	            if(payType.name().equals(PayTypeEnum.WX_PROGRAM_PAY.name())) {
@@ -1622,6 +1637,8 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
         rpTradePaymentOrder.setField3(bo.getField3());//扩展字段3
         rpTradePaymentOrder.setField4(bo.getField4());//扩展字段4
         rpTradePaymentOrder.setField5(bo.getField5());//扩展字段5
+        
+        rpTradePaymentOrder.setSubMerchantNo(bo.getSubMerchantNo());
 
         return rpTradePaymentOrder;
     }
