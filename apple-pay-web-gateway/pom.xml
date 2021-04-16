@@ -33,6 +33,12 @@
 		<dependency>
 			<groupId>com.appleframework.config</groupId>
 			<artifactId>apple-config-diamond</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+  					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
         <dependency>
@@ -54,18 +60,40 @@
             <!-- 表示开发的时候引入，发布的时候不会加载此包 -->
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-    		<groupId>org.codehaus.jackson</groupId>
-    		<artifactId>jackson-mapper-asl</artifactId>
-    		<version>1.9.13</version>
-		</dependency>
-		
+        		
 		<dependency>
 			<groupId>net.oschina.durcframework</groupId>
     		<artifactId>easyopen</artifactId>
     		<version>1.16.10.APPLE</version>
 		</dependency>
+		
+		
+		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.7.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.7.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.7.4</version>
+        </dependency>
+		
 
     </dependencies>
 
