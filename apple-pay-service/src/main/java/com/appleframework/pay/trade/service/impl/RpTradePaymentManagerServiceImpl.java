@@ -1048,7 +1048,7 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 		        PayService service =  new WxPayService(wxPayConfigStorage);
 		        
 		        
-		        BigDecimal totalFee = rpTradePaymentOrder.getOrderAmount().multiply(BigDecimal.valueOf(100d));
+		        BigDecimal totalFee = rpTradePaymentOrder.getOrderAmount();
 				// 支付订单基础信息
 				//String subject, String body, BigDecimal price, String outTradeNo
 				PayOrder payOrder = new PayOrder(rpTradePaymentOrder.getProductName(), 

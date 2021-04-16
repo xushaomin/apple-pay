@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.appleframework.pay.user.exception.UserBizException;
 import com.gitee.easyopen.ApiConfig;
 import com.gitee.easyopen.AppSecretManager;
-import com.gitee.easyopen.Signer;
 import com.gitee.easyopen.support.ApiController;
 
 /**

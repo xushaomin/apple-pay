@@ -5,7 +5,7 @@ import com.egzosn.pay.common.bean.MethodType;
 import com.egzosn.pay.common.bean.PayOrder;
 import com.egzosn.pay.common.http.HttpConfigStorage;
 import com.egzosn.pay.wx.api.WxPayConfigStorage;
-import com.egzosn.pay.wx.api.WxPayService;
+import com.egzosn.pay.wx.api.WxPayService2;
 import com.egzosn.pay.wx.bean.RedpackOrder;
 import com.egzosn.pay.wx.bean.WxSendredpackType;
 import com.egzosn.pay.wx.bean.WxTransactionType;
@@ -49,7 +49,7 @@ public class WxPayTest3 {
         //是否为测试账号，沙箱环境 此处暂未实现
         wxPayConfigStorage.setTest(false);
         //支付服务
-        WxPayService service =  new WxPayService(wxPayConfigStorage);
+        WxPayService2 service =  new WxPayService2(wxPayConfigStorage);
         //支付订单基础信息
         PayOrder payOrder = new PayOrder("订单title", "摘要",  BigDecimal.valueOf(0.01) , UUID.randomUUID().toString().replace("-", ""));
         payOrder.setExpirationTime(new Date(System.currentTimeMillis() + 3600));
