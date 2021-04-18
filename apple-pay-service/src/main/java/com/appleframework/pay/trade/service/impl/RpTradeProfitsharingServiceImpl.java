@@ -21,7 +21,6 @@ import com.appleframework.pay.trade.service.RpTradeProfitsharingService;
 import com.appleframework.pay.trade.utils.MD5Util;
 import com.appleframework.pay.user.entity.RpUserPayConfig;
 import com.appleframework.pay.user.entity.RpUserPayInfo;
-import com.appleframework.pay.user.enums.FundInfoTypeEnum;
 import com.appleframework.pay.user.exception.UserBizException;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
 import com.appleframework.pay.user.service.RpUserPayInfoService;
@@ -83,20 +82,11 @@ public class RpTradeProfitsharingServiceImpl implements RpTradeProfitsharingServ
         String payWayCode = rpTradePaymentRecord.getPayWayCode();//支付方式
         if (PayWayEnum.WEIXIN.name().equals(payWayCode)){//微信支付
         	
-			String appid = "";
-			String mch_id = "";
-			String partnerKey = "";
-			if (FundInfoTypeEnum.MERCHANT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())) {// 商户收款
-				// 根据资金流向获取配置信息
-				RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(), payWayCode);
-				appid = rpUserPayInfo.getAppId();
-				mch_id = rpUserPayInfo.getMerchantId();
-				partnerKey = rpUserPayInfo.getPartnerKey();
-			} else if (FundInfoTypeEnum.PLAT_RECEIVES.name().equals(rpTradePaymentOrder.getFundIntoType())) {// 平台收款
-				appid = PropertyConfigurer.getString("weixinpay.appId");
-				mch_id = PropertyConfigurer.getString("weixinpay.mch_id");
-				partnerKey = PropertyConfigurer.getString("weixinpay.partnerKey");
-			}
+			// 根据资金流向获取配置信息
+			RpUserPayInfo rpUserPayInfo = rpUserPayInfoService.getByUserNo(rpTradePaymentOrder.getMerchantNo(), payWayCode);
+			String appid = rpUserPayInfo.getAppId();
+			String mch_id = rpUserPayInfo.getMerchantId();
+			String partnerKey = rpUserPayInfo.getPartnerKey();
 			
             String subMerchantId = rpTradePaymentRecord.getSubMerchantNo();
         	
@@ -112,7 +102,7 @@ public class RpTradeProfitsharingServiceImpl implements RpTradeProfitsharingServ
     		wxPayConfigStorage.setInputCharset("utf-8");
     		
     	    HttpConfigStorage httpConfigStorage = new HttpConfigStorage();
-    	    httpConfigStorage.setKeystore("/Users/cruise/Downloads/cert/apiclient_cert.p12");
+    	    httpConfigStorage.setKeystore(rpUserPayInfo.getRsaPrivateKey());
     	    httpConfigStorage.setStorePassword(mch_id);
     	    
             httpConfigStorage.setCertStoreType(CertStoreType.PATH);

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.appleframework.pay.trade.dao.impl.RpTradeProfitsSharingReceiverDaoImpl">
+  <resultMap id="BaseResultMap" type="com.appleframework.pay.trade.entity.RpTradeProfitsSharingReceiver">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="version" jdbcType="BIGINT" property="version" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="edit_time" jdbcType="TIMESTAMP" property="editTime" />
+    <result column="user_no" jdbcType="VARCHAR" property="userNo" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="sub_user_no" jdbcType="VARCHAR" property="subUserNo" />
+    <result column="sub_user_name" jdbcType="VARCHAR" property="subUserName" />
+    <result column="pay_way_code" jdbcType="VARCHAR" property="payWayCode" />
+    <result column="pay_way_name" jdbcType="VARCHAR" property="payWayName" />
+    <result column="ps_type" jdbcType="VARCHAR" property="psType" />
+    <result column="ps_account" jdbcType="VARCHAR" property="psAccount" />
+    <result column="ps_name" jdbcType="VARCHAR" property="psName" />
+    <result column="ps_relation_type" jdbcType="VARCHAR" property="psRelationType" />
+    <result column="content_md5" jdbcType="VARCHAR" property="contentMd5" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, status, remark, version, create_time, edit_time, user_no, user_name, sub_user_no, 
+    sub_user_name, pay_way_code, pay_way_name, ps_type, ps_account, ps_name, ps_relation_type, 
+    content_md5
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from rp_trade_profits_sharing_receiver
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from rp_trade_profits_sharing_receiver
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.appleframework.pay.trade.entity.RpTradeProfitsSharingReceiver">
+    insert into rp_trade_profits_sharing_receiver (
+      id, status, remark, version, 
+      create_time, edit_time, user_no, 
+      user_name, sub_user_no, sub_user_name, 
+      pay_way_code, pay_way_name, ps_type, 
+      ps_account, ps_name, ps_relation_type, 
+      content_md5)
+    values (
+      #{id,jdbcType=VARCHAR},
+      #{status,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{version,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{editTime,jdbcType=TIMESTAMP}, #{userNo,jdbcType=VARCHAR}, 
+      #{userName,jdbcType=VARCHAR}, #{subUserNo,jdbcType=VARCHAR}, #{subUserName,jdbcType=VARCHAR}, 
+      #{payWayCode,jdbcType=VARCHAR}, #{payWayName,jdbcType=VARCHAR}, #{psType,jdbcType=VARCHAR}, 
+      #{psAccount,jdbcType=VARCHAR}, #{psName,jdbcType=VARCHAR}, #{psRelationType,jdbcType=VARCHAR}, 
+      #{contentMd5,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.appleframework.pay.trade.entity.RpTradeProfitsSharingReceiver">
+    update rp_trade_profits_sharing_receiver
+    set status = #{status,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      version = #{version,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      edit_time = #{editTime,jdbcType=TIMESTAMP},
+      user_no = #{userNo,jdbcType=VARCHAR},
+      user_name = #{userName,jdbcType=VARCHAR},
+      sub_user_no = #{subUserNo,jdbcType=VARCHAR},
+      sub_user_name = #{subUserName,jdbcType=VARCHAR},
+      pay_way_code = #{payWayCode,jdbcType=VARCHAR},
+      pay_way_name = #{payWayName,jdbcType=VARCHAR},
+      ps_type = #{psType,jdbcType=VARCHAR},
+      ps_account = #{psAccount,jdbcType=VARCHAR},
+      ps_name = #{psName,jdbcType=VARCHAR},
+      ps_relation_type = #{psRelationType,jdbcType=VARCHAR},
+      content_md5 = #{contentMd5,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <sql id="condition_sql">
+		<if test="status != null and status != '' "> and status = #{status,jdbcType=VARCHAR}</if>
+	</sql>
+
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		rp_trade_profits_sharing_receiver
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 对账查询 -->
+	<select id="listByColumn" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		rp_trade_profits_sharing_receiver
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<select id="listPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select * from rp_trade_profits_sharing_receiver
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<![CDATA[ order by create_time desc  limit #{pageFirst}, #{pageSize}]]>
+	</select>
+
+	<select id="listPageCount" parameterType="java.util.Map" resultType="long">
+		select count(1) from  rp_trade_payment_record
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+</mapper>

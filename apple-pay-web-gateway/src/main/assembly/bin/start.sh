@@ -84,7 +84,7 @@ JAVA_MEM_OPTS=" ${JMX_MEM} -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+C
 
 
 echo -e "Starting the $SERVER_NAME ...\c"
-nohup java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS com.appleframework.boot.Main env=$ENV > $STDOUT_FILE 2>&1 &
+nohup /work/install/jdk1.8.0_221/bin/java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS com.appleframework.boot.Main env=$ENV > $STDOUT_FILE 2>&1 &
 
 COUNT=0
 while [ $COUNT -lt 1 ]; do    
