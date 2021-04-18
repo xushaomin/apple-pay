@@ -16,13 +16,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.egzosn.pay.common.exception.PayErrorException;
 import com.egzosn.pay.common.http.ClientHttpRequest;
+import com.egzosn.pay.common.http.HttpConfigStorage;
 import com.egzosn.pay.common.http.HttpStringEntity;
 import com.egzosn.pay.common.util.Util;
 import com.egzosn.pay.common.util.XML;
 import com.egzosn.pay.common.util.sign.SignUtils;
+import com.egzosn.pay.wx.bean.WxAddReceiver;
 import com.egzosn.pay.wx.bean.WxPayError;
 import com.egzosn.pay.wx.bean.WxProfitSharing;
 import com.egzosn.pay.wx.bean.WxProfitSharingType;
@@ -41,6 +44,16 @@ public class WxPayService2 extends WxPayService implements WxProfitsharingServic
 	public WxPayService2(WxPayConfigStorage payConfigStorage) {
 		super(payConfigStorage);
 	}
+	
+	/**
+     * 创建支付服务
+     *
+     * @param payConfigStorage 微信对应的支付配置
+     * @param configStorage    微信对应的网络配置，包含代理配置、ssl证书配置
+     */
+    public WxPayService2(WxPayConfigStorage payConfigStorage, HttpConfigStorage configStorage) {
+        super(payConfigStorage, configStorage);
+    }
 
 	@Override
 	public Map<String, Object> doProfitsharing(WxProfitSharing profitSharing) {
@@ -57,24 +70,24 @@ public class WxPayService2 extends WxPayService implements WxProfitsharingServic
         receiver.put("description", profitSharing.getDescription());
         receivers.add(receiver);
         
-        parameters.put("receivers", receivers);
+        parameters.put("receivers", JSONUtils.toJSONString(receivers));
 
         setSign(parameters);
 
         String requestXML = XML.getMap2Xml(parameters);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("requestXML：" + requestXML);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("requestXML：" + requestXML);
         }
 
         HttpStringEntity entity = new HttpStringEntity(requestXML, ClientHttpRequest.APPLICATION_XML_UTF_8);
 
         //调起支付的参数列表
-        JSONObject result = requestTemplate.postForObject(getReqUrl(WxProfitSharingType.ONE), entity, JSONObject.class);
+        JSONObject result = requestTemplate.postForObject(getReqUrl(WxProfitSharingType.PROFITSHARING), entity, JSONObject.class);
 
         if (!SUCCESS.equals(result.get(RETURN_CODE)) || !SUCCESS.equals(result.get(RESULT_CODE))) {
             throw new PayErrorException(new WxPayError(result.getString(RESULT_CODE), result.getString(RETURN_MSG_CODE), result.toJSONString()));
         }
-        return result;		
+        return result;
 	}
 	
 	/**
@@ -111,6 +124,38 @@ public class WxPayService2 extends WxPayService implements WxProfitsharingServic
         parameters.put(NONCE_STR, SignUtils.randomStr());
         return parameters;
     }
+
+	@Override
+	public Map<String, Object> addReceiver(WxAddReceiver addReceiver) {
+		 //分账
+        Map<String, Object> parameters = getPublicParameters();
+        
+        Map<String, Object> receiver = new HashMap<>();
+        receiver.put("type", addReceiver.getType());
+        receiver.put("account", addReceiver.getAccount());
+        receiver.put("name", addReceiver.getName());
+        receiver.put("relation_type", addReceiver.getRelationType());
+        
+        parameters.put("receiver", JSONUtils.toJSONString(receiver));
+
+        setSign(parameters);
+
+        String requestXML = XML.getMap2Xml(parameters);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("requestXML：" + requestXML);
+        }
+        System.out.println(requestXML);
+
+        HttpStringEntity entity = new HttpStringEntity(requestXML, ClientHttpRequest.APPLICATION_XML_UTF_8);
+
+        //调起支付的参数列表
+        JSONObject result = requestTemplate.postForObject(getReqUrl(WxProfitSharingType.ADDRECEIVER), entity, JSONObject.class);
+
+        if (!SUCCESS.equals(result.get(RETURN_CODE)) || !SUCCESS.equals(result.get(RESULT_CODE))) {
+            throw new PayErrorException(new WxPayError(result.getString(RESULT_CODE), result.getString(RETURN_MSG_CODE), result.toJSONString()));
+        }
+        return result;		
+	}
    
 
 }

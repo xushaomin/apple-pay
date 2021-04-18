@@ -1066,14 +1066,20 @@ public class RpTradePaymentManagerServiceImpl implements RpTradePaymentManagerSe
 			        //微信公众号对应微信付款用户的唯一标识
 			        payOrder.setOpenid(rpTradePaymentOrder.getField5());
 			        Map<String, String> prePay = service.orderInfo(payOrder);
-			        System.out.println(prePay);
+			        String paySign = prePay.get("paySign");
+			        if(null != paySign) {
+			        	prePay.put("sign", paySign);
+			        }
 			        appPayResultVo.setPrePay(prePay);
                 }
                 else {
                     payOrder.setTransactionType(WxTransactionType.APP);
                     //获取APP支付所需的信息组，直接给app端就可使用
                     Map<String, String> prePay = service.orderInfo(payOrder);
-                    System.out.println(prePay);
+                    String paySign = prePay.get("paySign");
+			        if(null != paySign) {
+			        	prePay.put("sign", paySign);
+			        }
                     appPayResultVo.setPrePay(prePay);
                 }
 			} else {

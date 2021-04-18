@@ -7,7 +7,8 @@ public enum WxProfitSharingType implements TransactionType {
 	/**
 	 * 单一分账
 	 */
-	ONE("secapi/pay/profitsharing");
+	PROFITSHARING("secapi/pay/profitsharing"),
+	ADDRECEIVER("pay/profitsharingaddreceiver");
 
 	WxProfitSharingType(String method) {
 		this.method = method;

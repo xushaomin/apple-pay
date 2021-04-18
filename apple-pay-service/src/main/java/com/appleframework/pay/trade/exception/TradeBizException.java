@@ -49,6 +49,10 @@ public class TradeBizException extends BizException {
 	
 	/** 参数异常 **/
 	public static final int TRADE_APPLE_ERROR = 108;
+	
+	/** 分账异常 **/
+	public static final int TRADE_PRSH_ERROR = 109;
+
 
 	private static final Log LOG = LogFactory.getLog(TradeBizException.class);
 

@@ -15,27 +15,17 @@
  */
 package com.appleframework.pay.trade.service;
 
-import java.math.BigDecimal;
-
-import com.appleframework.pay.common.core.enums.PayWayEnum;
+import com.appleframework.pay.trade.entity.RpTradeProfitsSharingReceiver;
 
 /**
  * <b>功能说明:分账接口</b>
  * @author  Cruise.Xu
  * <a href="http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
  */
-public interface RpTradeProfitsharingService {
+public interface RpTradeProfitsSharingReceiverService {
+	
+    public RpTradeProfitsSharingReceiver getByMD5(String md5);
     
-    /**
-     * @param orderNo   商户订单号
-     * @param amount 分账金额
-     */
-    public void doSharing(String payKey, String merchantOrderNo, BigDecimal amount);
-    
-    /**
-     * @param subMerchantNo   子商户帐号
-     * @param type 分账类型
-     */
-    public void addReceiver(String payKey, String subMerchantNo, PayWayEnum payWay);
+    public void addReceiver(RpTradeProfitsSharingReceiver rpTradeProfitsSharingReceiver);
     
 }

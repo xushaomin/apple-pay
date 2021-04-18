@@ -28,8 +28,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.appleframework.pay.common.core.enums.PayWayEnum;
 import com.appleframework.pay.controller.common.BaseController;
+import com.appleframework.pay.trade.exception.TradeBizException;
 import com.appleframework.pay.trade.service.RpTradeProfitsharingService;
+import com.appleframework.pay.trade.utils.MerchantApiUtil;
 import com.appleframework.pay.user.entity.RpUserPayConfig;
 import com.appleframework.pay.user.exception.UserBizException;
 import com.appleframework.pay.user.service.RpUserPayConfigService;
@@ -82,17 +85,49 @@ public class ProfitsharingController extends BaseController {
 			throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
 		}
 
-		//if (!MerchantApiUtil.isRightSign(paramMap, rpUserPayConfig.getPaySecret(), sign)) {
-            //throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
-        //}
+		if (!MerchantApiUtil.isRightSign(paramMap, rpUserPayConfig.getPaySecret(), sign)) {
+            throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
+        }
 
 		BigDecimal amount = BigDecimal.valueOf(Double.valueOf(amountStr));
 		
-        Map<String, Object> map = rpTradeProfitsharingService.doSharing(payKey, orderNo, amount);
-
+        rpTradeProfitsharingService.doSharing(payKey, orderNo, amount);
         //LOG.info("PrePay:" + appPayResultVo.getPrePay());
 		//LOG.info("PAY返回:" + JSON.toJSONString(appPayResultVo));
-        return map;
+        return "SUCCESS";
+    }
+    
+    @RequestMapping(value = "/addreceiver")
+    public @ResponseBody Object addreceiver(Model model){
+        Map<String , Object> paramMap = new HashMap<String , Object>();
+
+        //获取商户传入参数
+        String payKey = getString_UrlDecode_UTF8("payKey"); // 企业支付KEY
+        paramMap.put("payKey",payKey);
+        String subMerchantNo = getString_UrlDecode_UTF8("subMerchantNo"); // 分账帐号
+        paramMap.put("subMerchantNo", subMerchantNo);
+                
+        String sign = getString_UrlDecode_UTF8("sign"); // 签名
+                
+		LOG.info("PAY请求参数:" + JSON.toJSONString(paramMap));
+        
+		RpUserPayConfig rpUserPayConfig = rpUserPayConfigService.getByPayKey(payKey);
+		if (rpUserPayConfig == null) {
+			throw new UserBizException(UserBizException.USER_PAY_CONFIG_ERRPR, "用户支付配置有误");
+		}
+
+		if (!MerchantApiUtil.isRightSign(paramMap, rpUserPayConfig.getPaySecret(), sign)) {
+            throw new TradeBizException(TradeBizException.TRADE_ORDER_ERROR,"订单签名异常");
+        }
+		
+		try {
+	        rpTradeProfitsharingService.addReceiver(payKey, subMerchantNo, PayWayEnum.WEIXIN);
+		} catch (TradeBizException e) {
+			LOG.info(e.getMessage());
+		}
+        //LOG.info("PrePay:" + appPayResultVo.getPrePay());
+		//LOG.info("PAY返回:" + JSON.toJSONString(appPayResultVo));
+        return "SUCCESS";
     }
 
 }
