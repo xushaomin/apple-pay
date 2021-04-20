@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import com.appleframework.pay.common.core.exception.BizException;
 
@@ -40,7 +41,6 @@ public class PayExceptionResolver implements HandlerExceptionResolver {
 
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-
         if (BizException.class.isAssignableFrom(ex.getClass())) {//如果是业务异常类
             BizException bizException = (BizException) ex;
             try {
@@ -51,10 +51,12 @@ public class PayExceptionResolver implements HandlerExceptionResolver {
                 map.put("code", bizException.getCode());//将错误信息传递给view
                 map.put("message", bizException.getMsg());
                 //return new ModelAndView(new MappingJacksonJsonView(),map);
-                return new ModelAndView("MappingJacksonJsonView",map);
+                //return new ModelAndView("MappingJackson2JsonView", map);
+                return new ModelAndView(new MappingJackson2JsonView(), map);
+                //ModelAndView modelAndView = new ModelAndView(new MappingJackson2JsonView()).addAllObjects(jsonData.toMap());
+
             } catch (Exception e) {
                 LOG.error("系统异常:", e);
-
             }
         }
         return null;

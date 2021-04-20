@@ -83,9 +83,11 @@ public class WxPayService2 extends WxPayService implements WxProfitsharingServic
 
         //调起支付的参数列表
         JSONObject result = requestTemplate.postForObject(getReqUrl(WxProfitSharingType.PROFITSHARING), entity, JSONObject.class);
-
+        if (LOG.isInfoEnabled()) {
+            LOG.info("result：\n" + result);
+        }
         if (!SUCCESS.equals(result.get(RETURN_CODE)) || !SUCCESS.equals(result.get(RESULT_CODE))) {
-            throw new PayErrorException(new WxPayError(result.getString(RESULT_CODE), result.getString(RETURN_MSG_CODE), result.toJSONString()));
+            throw new PayErrorException(new WxPayError(result.getString(RESULT_CODE), result.getString("err_code_des"), result.toJSONString()));
         }
         return result;
 	}

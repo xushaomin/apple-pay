@@ -25,7 +25,7 @@ import java.util.Map;
  * @author Cruise.Xu <a href=
  *         "http://www.appleframework.com">appleframework(http://www.appleframework.com)</a>
  */
-public class AppPayResultVo implements Serializable {
+public class AppPayResultVo extends BaseVo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

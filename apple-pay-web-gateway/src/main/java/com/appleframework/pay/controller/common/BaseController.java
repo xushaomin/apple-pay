@@ -36,6 +36,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.appleframework.pay.common.core.utils.StringUtil;
 import com.appleframework.pay.trade.model.OrderPayBo;
+import com.appleframework.pay.trade.vo.BaseVo;
 
 
 /**
@@ -51,6 +52,8 @@ public abstract class BaseController {
 	private static final String UTF_8 = "utf-8";
 
 	//private static final String GBK = "GBK";
+	
+	protected BaseVo baseVo = new BaseVo();
 
 	/**
 	 * 获取request
