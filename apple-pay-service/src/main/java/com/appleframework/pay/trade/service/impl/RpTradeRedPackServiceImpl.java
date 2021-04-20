@@ -25,7 +25,6 @@ import com.appleframework.pay.user.service.RpUserPayInfoService;
 import com.egzosn.pay.common.bean.CertStoreType;
 import com.egzosn.pay.common.exception.PayErrorException;
 import com.egzosn.pay.common.http.HttpConfigStorage;
-import com.egzosn.pay.wx.api.WxConst;
 import com.egzosn.pay.wx.api.WxPayConfigStorage;
 import com.egzosn.pay.wx.api.WxPayService2;
 import com.egzosn.pay.wx.bean.RedpackOrder;
@@ -75,13 +74,13 @@ public class RpTradeRedPackServiceImpl implements RpTradeRedPackService {
     		wxPayConfigStorage.setSignType("MD5");
     		wxPayConfigStorage.setInputCharset("utf-8");
     		
-    		//HttpConfigStorage httpConfigStorage = new HttpConfigStorage();
-    	    //httpConfigStorage.setKeystore(rpUserPayInfo.getRsaPrivateKey());
-    	    //httpConfigStorage.setStorePassword(mch_id);
+    		HttpConfigStorage httpConfigStorage = new HttpConfigStorage();
+    	    httpConfigStorage.setKeystore(rpUserPayInfo.getRsaPrivateKey());
+    	    httpConfigStorage.setStorePassword(mch_id);
     	    
-            //httpConfigStorage.setCertStoreType(CertStoreType.PATH);
+            httpConfigStorage.setCertStoreType(CertStoreType.PATH);
 	        //支付服务
-    		WxPayService2 service =  new WxPayService2(wxPayConfigStorage);
+    		WxPayService2 service =  new WxPayService2(wxPayConfigStorage, httpConfigStorage);
     		
     		int id = count.incrementAndGet();
     		if(id > 9999) {
